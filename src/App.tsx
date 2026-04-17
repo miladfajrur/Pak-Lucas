@@ -3,6 +3,8 @@ import { motion, AnimatePresence } from 'motion/react';
 import { BookOpen, GraduationCap, FileText, Download, Mail, Phone, MapPin, ExternalLink, ChevronRight, Menu, X, Book, LayoutDashboard } from 'lucide-react';
 import { personalInfo as initPersonal, publications as initPubs, teachingMaterials as initTeaching, researchProjects as initRes } from './lib/data';
 import AdminDashboard from './AdminDashboard';
+import { doc, onSnapshot } from 'firebase/firestore';
+import { db } from './firebase';
 
 function NavLink({ href, text, activeSection, onClick }: { href: string, text: string, activeSection: string, onClick?: () => void }) {
   const isActive = activeSection === href.replace('#', '');
@@ -39,6 +41,25 @@ export default function App() {
       researchProjects: initRes
     };
   });
+
+  useEffect(() => {
+    const unsub = onSnapshot(doc(db, 'portfolio', 'data'), (docSnap) => {
+      if (docSnap.exists()) {
+        const d = docSnap.data();
+        const updatedData = {
+          personalInfo: d.personalInfo ? JSON.parse(d.personalInfo) : initPersonal,
+          publications: d.publications ? JSON.parse(d.publications) : initPubs,
+          teachingMaterials: d.teachingMaterials ? JSON.parse(d.teachingMaterials) : initTeaching,
+          researchProjects: d.researchProjects ? JSON.parse(d.researchProjects) : initRes
+        };
+        setAppData(updatedData);
+        localStorage.setItem('portfolioData', JSON.stringify(updatedData));
+      }
+    }, (error) => {
+      console.error("Firebase read error:", error);
+    });
+    return () => unsub();
+  }, []);
 
   const { personalInfo, publications, teachingMaterials, researchProjects } = appData;
 
@@ -170,10 +191,10 @@ export default function App() {
                 <GraduationCap size={14} />
                 <span>Akademisi</span>
               </div>
-              <h1 className="font-serif text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.1] tracking-tight mb-6 text-academic-primary">
-                Eksplorasi<br />
-                <span className="text-academic-accent italic">Pendidikan Kristen</span><br />
-                & Kepemimpinan.
+              <h1 className="font-serif text-4xl sm:text-5xl md:text-[3.2rem] lg:text-[4rem] xl:text-[4.5rem] font-bold leading-[1.15] tracking-tight mb-6 text-academic-primary">
+                Komunikasi,<br />
+                <span className="text-academic-accent italic">Pendidikan Kristen</span>,<br />
+                <span className="text-academic-ink/80">&amp; Kepemimpinan.</span>
               </h1>
               <p className="text-lg text-academic-muted leading-relaxed mb-8 max-w-lg">
                 {personalInfo.bio}
@@ -190,12 +211,12 @@ export default function App() {
             </motion.div>
 
             <motion.div 
-              initial={{ opacity: 0, scale: 0.9 }}
+              initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.8, delay: 0.2 }}
-              className="order-1 md:order-2 relative flex justify-center"
+              className="order-1 md:order-2 relative flex justify-center md:justify-end w-full"
             >
-              <div className="w-[300px] h-[400px] md:w-[360px] md:h-[480px] rounded-2xl overflow-hidden relative shadow-2xl bg-academic-bg">
+              <div className="w-full max-w-[300px] sm:max-w-[340px] md:max-w-[400px] aspect-[4/5] rounded-[2rem] overflow-hidden relative shadow-2xl shadow-academic-primary/5 bg-academic-bg border-8 border-white">
                 {/* Gunakan layout height yang lebih besar (112%) daripada scale CSS, 
                     untuk mencegah gambar pecah (rasterization blur) oleh GPU di browser, 
                     sambil tetap meng-crop watermark di bagian bawah */}
@@ -206,12 +227,12 @@ export default function App() {
                   style={{ imageRendering: 'high-quality', WebkitFontSmoothing: 'antialiased' }}
                   referrerPolicy="no-referrer"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-academic-bg/40 via-transparent to-transparent pointer-events-none" />
+                <div className="absolute inset-0 bg-gradient-to-t from-academic-ink/30 via-transparent to-transparent pointer-events-none" />
               </div>
               
               {/* Decorative elements */}
-              <div className="absolute bottom-10 -left-6 md:left-0 bg-white p-6 rounded-2xl shadow-xl border border-academic-muted/10 max-w-[200px]">
-                <p className="font-serif font-bold text-academic-primary text-3xl">STTIAA</p>
+              <div className="absolute bottom-8 -left-2 sm:-left-6 md:-left-8 bg-white/95 backdrop-blur-md p-5 pb-4 rounded-2xl shadow-xl border border-academic-muted/10 max-w-[200px] md:max-w-[220px]">
+                <p className="font-serif font-bold text-academic-primary text-2xl md:text-3xl">STTIAA</p>
                 <p className="text-xs uppercase tracking-wider text-academic-muted mt-1 text-balance">Sekolah Tinggi Theologi Injili Abdi Allah</p>
               </div>
             </motion.div>

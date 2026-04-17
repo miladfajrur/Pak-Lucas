@@ -1,27 +1,95 @@
 import React, { useState } from 'react';
-import { X, Plus, Trash2, Save, LogOut } from 'lucide-react';
+import { X, Plus, Trash2, Save, LogOut, UploadCloud, Loader2 } from 'lucide-react';
+import { doc, setDoc } from 'firebase/firestore';
+import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
+import { db, storage, auth } from './firebase';
+import { signInAnonymously } from 'firebase/auth';
 
 export default function AdminDashboard({ data, setData, onClose }: any) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
+  const [uploadingState, setUploadingState] = useState<{ [key: string]: number }>({});
   
   const [activeTab, setActiveTab] = useState('bio');
   const [draftData, setDraftData] = useState(data);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     if (username === 'lucas' && password === 'lucas') {
-      setIsAuthenticated(true);
+      try {
+        await signInAnonymously(auth);
+        setIsAuthenticated(true);
+      } catch (error) {
+        console.error("Login failed", error);
+        alert("Gagal melakukan autentikasi dengan server Firebase.");
+      }
     } else {
       alert('Username atau password salah!');
     }
   };
 
-  const handleSave = () => {
-    setData(draftData);
-    localStorage.setItem('portfolioData', JSON.stringify(draftData));
-    alert('Perubahan berhasil disimpan! Mode pengunjung (public view) kini menampilkan data terbaru.');
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+      const docRef = doc(db, 'portfolio', 'data');
+      await setDoc(docRef, {
+        personalInfo: JSON.stringify(draftData.personalInfo),
+        publications: JSON.stringify(draftData.publications),
+        teachingMaterials: JSON.stringify(draftData.teachingMaterials),
+        researchProjects: JSON.stringify(draftData.researchProjects),
+        updatedAt: new Date().toISOString()
+      });
+      setData(draftData);
+      localStorage.setItem('portfolioData', JSON.stringify(draftData));
+      alert('Perubahan berhasil disimpan secara Global! Pengunjung kini akan melihat data terbaru.');
+    } catch (error) {
+      console.error(error);
+      alert('Gagal menyimpan ke Database Firestore. Periksa koneksi internet Anda atau Rule Firestore.');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>, callback: (url: string, size: string) => void, uploadId: string) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Hitung ukuran MB
+    const sizeInMB = (file.size / (1024 * 1024)).toFixed(2) + ' MB';
+
+    // Buat referensi storage ke Firebase
+    const storageRef = ref(storage, `uploads/${Date.now()}_${file.name}`);
+    const uploadTask = uploadBytesResumable(storageRef, file);
+
+    setUploadingState(prev => ({ ...prev, [uploadId]: 0 }));
+
+    uploadTask.on('state_changed', 
+      (snapshot) => {
+        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        setUploadingState(prev => ({ ...prev, [uploadId]: progress }));
+      }, 
+      (error) => {
+        console.error(error);
+        alert("Gagal mengupload file ke Storage.");
+        setUploadingState(prev => {
+          const newState = { ...prev };
+          delete newState[uploadId];
+          return newState;
+        });
+      }, 
+      () => {
+        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+          callback(downloadURL, sizeInMB);
+          setUploadingState(prev => {
+            const newState = { ...prev };
+            delete newState[uploadId];
+            return newState;
+          });
+        });
+      }
+    );
   };
 
   if (!isAuthenticated) {
@@ -48,7 +116,7 @@ export default function AdminDashboard({ data, setData, onClose }: any) {
               <input type="password" value={password} onChange={e => setPassword(e.target.value)} className="w-full px-4 py-3 bg-academic-bg border border-academic-muted/20 rounded-xl focus:ring-2 focus:ring-academic-accent focus:border-academic-accent outline-none text-sm" required />
             </div>
             <button type="submit" className="w-full bg-academic-primary text-white py-3.5 mt-2 rounded-xl font-medium hover:bg-academic-accent transition-colors shadow-lg">
-              Masuk
+              Masuk Server Cloud
             </button>
           </form>
         </div>
@@ -56,7 +124,6 @@ export default function AdminDashboard({ data, setData, onClose }: any) {
     );
   }
 
-  // --- Helpers for updating draftData ---
   const handleBioChange = (field: string, value: string) => {
     setDraftData({ ...draftData, personalInfo: { ...draftData.personalInfo, [field]: value } });
   };
@@ -131,15 +198,14 @@ export default function AdminDashboard({ data, setData, onClose }: any) {
 
   return (
     <div className="fixed inset-0 bg-academic-bg z-[100] flex flex-col h-screen overflow-hidden text-academic-ink">
-      {/* Header */}
       <div className="bg-white border-b border-academic-muted/20 px-6 py-4 flex justify-between items-center shrink-0 shadow-sm z-10">
         <div className="flex items-center gap-4">
           <h1 className="font-serif text-2xl font-bold text-academic-primary">Admin Control Panel</h1>
-          <span className="bg-green-100 text-green-700 text-xs font-bold px-3 py-1 rounded-full border border-green-200">Editor Mode</span>
+          <span className="bg-green-100 text-green-700 text-xs font-bold px-3 py-1 rounded-full border border-green-200">Terhubung ke Cloud Database</span>
         </div>
         <div className="flex gap-4">
-          <button onClick={handleSave} className="flex items-center gap-2 bg-academic-accent text-white px-5 py-2 rounded-xl font-medium hover:opacity-90 transition-opacity shadow-md">
-            <Save size={18} /> Simpan Perubahan
+          <button onClick={handleSave} disabled={isSaving} className="flex items-center gap-2 bg-academic-accent text-white px-5 py-2 rounded-xl font-medium hover:opacity-90 transition-opacity shadow-md disabled:opacity-50">
+            {isSaving ? <Loader2 className="animate-spin" size={18} /> : <Save size={18} />} Simpan ke Server
           </button>
           <button onClick={onClose} className="flex items-center gap-2 bg-academic-bg text-academic-ink border border-academic-muted/20 hover:bg-red-50 hover:text-red-600 hover:border-red-200 px-4 py-2 rounded-xl font-medium transition-all">
             <LogOut size={18} /> Keluar
@@ -148,7 +214,6 @@ export default function AdminDashboard({ data, setData, onClose }: any) {
       </div>
 
       <div className="flex flex-1 overflow-hidden relative">
-        {/* Sidebar */}
         <div className="w-64 bg-white border-r border-academic-muted/10 p-4 shrink-0 flex flex-col gap-2 z-10">
           <p className="text-xs font-bold uppercase tracking-widest text-academic-muted mb-4 mt-2 px-4">Menu Editing</p>
           {tabs.map(tab => (
@@ -162,11 +227,9 @@ export default function AdminDashboard({ data, setData, onClose }: any) {
           ))}
         </div>
 
-        {/* Content Area */}
         <div className="flex-1 overflow-y-auto p-8 bg-academic-bg">
           <div className="max-w-5xl mx-auto bg-white rounded-3xl shadow-sm border border-academic-muted/10 p-8 md:p-10">
             
-            {/* BIO EDITOR */}
             {activeTab === 'bio' && (
               <div className="space-y-6">
                 <h2 className="text-2xl font-serif font-bold text-academic-primary border-b border-academic-muted/10 pb-4 mb-8">Edit Biodata & Kontak Penuh</h2>
@@ -195,7 +258,6 @@ export default function AdminDashboard({ data, setData, onClose }: any) {
               </div>
             )}
 
-            {/* PUBLICATIONS EDITOR */}
             {activeTab === 'pub' && (
               <div>
                 <div className="flex justify-between items-center border-b border-academic-muted/10 pb-4 mb-8">
@@ -205,7 +267,9 @@ export default function AdminDashboard({ data, setData, onClose }: any) {
                   </button>
                 </div>
                 <div className="space-y-8">
-                  {draftData.publications.map((item: any, idx: number) => (
+                  {draftData.publications.map((item: any, idx: number) => {
+                    const upId = `pub_${idx}`;
+                    return (
                     <div key={idx} className="p-6 md:p-8 border border-academic-muted/20 rounded-2xl relative bg-white shadow-sm hover:shadow-md transition-shadow">
                       <button onClick={() => removePub(idx)} className="absolute top-6 right-6 text-red-400 hover:text-red-600 bg-red-50 hover:bg-red-100 p-2 rounded-lg transition-colors"><Trash2 size={18} /></button>
                       <h3 className="font-bold text-lg mb-6 pr-12 text-academic-ink">Publikasi #{idx + 1}: {item.title || '(Tanpa Judul)'}</h3>
@@ -215,8 +279,19 @@ export default function AdminDashboard({ data, setData, onClose }: any) {
                           <input type="text" value={item.title} onChange={e => updatePub(idx, 'title', e.target.value)} className="w-full px-4 py-3 bg-academic-bg border border-academic-muted/20 rounded-xl focus:ring-2 focus:ring-academic-accent outline-none text-sm font-serif font-medium" />
                         </div>
                         <div>
-                          <label className="block text-xs font-bold uppercase tracking-widest text-academic-muted mb-2">Link Akses URL</label>
-                          <input type="text" value={item.link} onChange={e => updatePub(idx, 'link', e.target.value)} className="w-full px-4 py-3 bg-academic-bg border border-academic-muted/20 rounded-xl focus:ring-2 focus:ring-academic-accent outline-none text-sm" />
+                          <label className="block flex items-center justify-between text-xs font-bold uppercase tracking-widest text-academic-muted mb-2">
+                            <span>Link URL (Atau Upload PDF)</span>
+                            {uploadingState[upId] !== undefined && (
+                              <span className="text-academic-accent">Uploading {Math.round(uploadingState[upId])}%</span>
+                            )}
+                          </label>
+                          <div className="flex relative">
+                             <input type="text" value={item.link} onChange={e => updatePub(idx, 'link', e.target.value)} className="w-full px-4 py-3 bg-academic-bg border border-academic-muted/20 rounded-l-xl focus:ring-2 focus:ring-academic-accent outline-none text-sm" placeholder="https://" />
+                             <label title="Upload PDF ke Cloud" className="bg-academic-accent border border-academic-accent text-white px-4 py-3 rounded-r-xl cursor-pointer hover:bg-academic-primary transition-colors flex items-center justify-center shrink-0">
+                               {uploadingState[upId] !== undefined ? <Loader2 className="animate-spin" size={18} /> : <UploadCloud size={18} />}
+                               <input type="file" className="hidden" accept=".pdf,.doc,.docx" onChange={(e) => handleFileUpload(e, (url) => updatePub(idx, 'link', url), upId)} />
+                             </label>
+                          </div>
                         </div>
                         <div>
                           <label className="block text-xs font-bold uppercase tracking-widest text-academic-muted mb-2">Penulis (Authors)</label>
@@ -239,12 +314,11 @@ export default function AdminDashboard({ data, setData, onClose }: any) {
                         </div>
                       </div>
                     </div>
-                  ))}
+                  )})}
                 </div>
               </div>
             )}
 
-            {/* TEACHING EDITOR */}
             {activeTab === 'teach' && (
               <div>
                 <div className="flex justify-between items-center border-b border-academic-muted/10 pb-4 mb-8">
@@ -283,22 +357,31 @@ export default function AdminDashboard({ data, setData, onClose }: any) {
                         </div>
                         <div className="space-y-3">
                           {course.materials.length === 0 && <p className="text-sm text-academic-muted italic text-center py-4">Belum ada file materi ditambahkan untuk kampus/kursus ini.</p>}
-                          {course.materials.map((mat: any, mIdx: number) => (
-                            <div key={mIdx} className="flex flex-col md:flex-row gap-3 items-center bg-white p-3 rounded-xl border border-academic-muted/10">
+                          {course.materials.map((mat: any, mIdx: number) => {
+                            const upId = `mat_${cIdx}_${mIdx}`;
+                            return (
+                             <div key={mIdx} className="flex flex-col md:flex-row gap-3 items-center bg-white p-3 rounded-xl border border-academic-muted/10">
                               <input type="text" placeholder="Judul File / Topik Materi" value={mat.title} onChange={e => updateMaterial(cIdx, mIdx, 'title', e.target.value)} className="w-full md:flex-1 px-3 py-2 bg-academic-bg rounded-lg text-sm border-transparent focus:border-academic-accent outline-none" />
-                              <div className="flex w-full md:w-auto gap-3">
-                                <select value={mat.type} onChange={e => updateMaterial(cIdx, mIdx, 'type', e.target.value)} className="w-24 px-3 py-2 border border-academic-muted/20 rounded-lg text-sm font-semibold bg-white outline-none">
+                              <div className="flex w-full md:w-auto gap-2 items-center">
+                                <select value={mat.type} onChange={e => updateMaterial(cIdx, mIdx, 'type', e.target.value)} className="w-20 px-3 py-2 border border-academic-muted/20 rounded-lg text-sm font-semibold bg-white outline-none">
                                   <option value="pdf">PDF</option>
                                   <option value="ppt">PPT</option>
                                   <option value="doc">DOC</option>
                                   <option value="zip">ZIP</option>
                                 </select>
-                                <input type="text" placeholder="Ukuran (1MB)" value={mat.size} onChange={e => updateMaterial(cIdx, mIdx, 'size', e.target.value)} className="w-24 px-3 py-2 bg-academic-bg border border-academic-muted/20 rounded-lg text-sm outline-none" />
-                                <input type="text" placeholder="URL Asli Google Drive" value={mat.link} onChange={e => updateMaterial(cIdx, mIdx, 'link', e.target.value)} className="flex-1 md:w-48 px-3 py-2 bg-academic-bg border border-academic-muted/20 rounded-lg text-sm outline-none" />
-                                <button onClick={() => removeMaterial(cIdx, mIdx)} className="text-red-400 hover:text-red-600 bg-red-50 hover:bg-red-100 p-2 rounded-lg"><Trash2 size={18} /></button>
+                                <input type="text" placeholder="Size" value={mat.size} onChange={e => updateMaterial(cIdx, mIdx, 'size', e.target.value)} className="w-20 px-3 py-2 bg-academic-bg border border-academic-muted/20 rounded-lg text-sm outline-none" />
+                                <div className="flex relative">
+                                  <input type="text" placeholder="URL Link" value={mat.link} onChange={e => updateMaterial(cIdx, mIdx, 'link', e.target.value)} className="w-32 md:w-40 px-3 py-2 bg-academic-bg border border-academic-muted/20 rounded-l-lg text-sm outline-none" />
+                                  <label title="Upload File ke Cloud Storage" className="bg-academic-accent text-white px-3 py-2 rounded-r-lg cursor-pointer hover:bg-academic-primary transition-colors flex items-center justify-center shrink-0">
+                                    {uploadingState[upId] !== undefined ? <Loader2 className="animate-spin" size={16} /> : <UploadCloud size={16} />}
+                                    <input type="file" className="hidden" accept=".pdf,.doc,.docx,.ppt,.pptx,.zip" onChange={(e) => handleFileUpload(e, (url, sz) => { updateMaterial(cIdx, mIdx, 'link', url); updateMaterial(cIdx, mIdx, 'size', sz); }, upId)} />
+                                  </label>
+                                </div>
+                                <button onClick={() => removeMaterial(cIdx, mIdx)} className="text-red-400 hover:text-red-600 bg-red-50 hover:bg-red-100 p-2 rounded-lg ml-1"><Trash2 size={18} /></button>
                               </div>
-                            </div>
-                          ))}
+                             </div>
+                            );
+                          })}
                         </div>
                       </div>
                     </div>
@@ -307,7 +390,6 @@ export default function AdminDashboard({ data, setData, onClose }: any) {
               </div>
             )}
 
-            {/* RESEARCH EDITOR */}
             {activeTab === 'res' && (
               <div>
                 <div className="flex justify-between items-center border-b border-academic-muted/10 pb-4 mb-8">

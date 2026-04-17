@@ -1,0 +1,31 @@
+rules_version = '2';
+
+// ===============================================================
+// Assumed Data Model
+// ===============================================================
+// Collection: portfolio
+// Document ID: data
+// Fields:
+//   - personalInfo: string (JSON)
+//   - publications: string (JSON)
+//   - teachingMaterials: string (JSON)
+//   - researchProjects: string (JSON)
+//   - updatedAt: string
+// ===============================================================
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    function isAuthenticated() {
+       return request.auth != null;
+    }
+
+    match /portfolio/{docId} {
+      // Allow public read since this is a public portfolio website
+      allow read: if docId == 'data';
+      
+      // Allow write if authenticated (Admin uses anonymous auth or Google Auth)
+      allow write: if isAuthenticated() && docId == 'data';
+    }
+  }
+}

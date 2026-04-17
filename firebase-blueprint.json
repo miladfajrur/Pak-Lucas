@@ -1,0 +1,37 @@
+{
+  "entities": {
+    "PortfolioData": {
+      "title": "PortfolioData",
+      "description": "Global portfolio data for the lecturer",
+      "type": "object",
+      "properties": {
+        "personalInfo": {
+          "type": "string",
+          "description": "JSON string of personal info"
+        },
+        "publications": {
+          "type": "string",
+          "description": "JSON string of publications array"
+        },
+        "teachingMaterials": {
+          "type": "string",
+          "description": "JSON string of teaching materials array"
+        },
+        "researchProjects": {
+          "type": "string",
+          "description": "JSON string of research projects array"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    }
+  },
+  "firestore": {
+    "/portfolio/data": {
+      "schema": "PortfolioData",
+      "description": "Store the global portfolio data"
+    }
+  }
+}
