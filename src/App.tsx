@@ -392,7 +392,14 @@ export default function App() {
                               {mat.type}
                             </div>
                             <div>
-                              <span className="text-sm font-medium block group-hover:text-academic-primary transition-colors">{mat.title}</span>
+                              <a 
+                                href={directLink} 
+                                target={isDriveLink ? "_self" : "_blank"}
+                                rel={isDriveLink ? "" : "noopener noreferrer"}
+                                className="text-sm font-medium block group-hover:text-academic-primary transition-colors focus:outline-none focus:underline"
+                              >
+                                {mat.title}
+                              </a>
                             </div>
                           </div>
                           <a 
