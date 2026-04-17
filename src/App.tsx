@@ -127,7 +127,7 @@ export default function App() {
       
       {/* Navigation */}
       <header className={`fixed top-0 w-full z-50 transition-all duration-500 ${isScrolled ? 'bg-academic-bg/90 backdrop-blur-md border-b border-academic-muted/20 py-4 shadow-sm' : 'bg-transparent py-6'}`}>
-        <div className="max-w-[1600px] mx-auto px-6 md:px-16 lg:px-24 xl:px-40 flex justify-between items-center w-full">
+        <div className="max-w-[1920px] mx-auto px-6 md:px-12 lg:px-16 flex justify-between items-center w-full">
           <a href="#home" className="flex flex-col">
             <span className="font-serif font-bold text-xl text-academic-primary tracking-tight">DR. LUCAS M. PATTINAMA</span>
             <span className="text-xs uppercase tracking-widest text-academic-muted mt-0.5">Dosen & Peneliti</span>
@@ -179,8 +179,8 @@ export default function App() {
 
       <main className="pt-24 md:pt-28">
         {/* Home / Hero Section */}
-        <section id="home" className="min-h-[calc(100vh-7rem)] flex items-center justify-center w-full px-6 md:px-16 lg:px-24 xl:px-40 py-8 md:py-4">
-          <div className="grid md:grid-cols-2 gap-8 md:gap-16 lg:gap-24 items-center w-full max-w-[1600px]">
+        <section id="home" className="min-h-[calc(100vh-7rem)] flex items-center justify-center w-full px-6 md:px-12 lg:px-16 py-8 md:py-4">
+          <div className="grid md:grid-cols-2 gap-8 md:gap-16 lg:gap-24 items-center w-full max-w-[1920px]">
             <motion.div 
               initial={{ opacity: 0, x: -30 }}
               animate={{ opacity: 1, x: 0 }}
@@ -240,14 +240,14 @@ export default function App() {
         </section>
 
         {/* Section Divider */}
-        <div className="max-w-[1600px] mx-auto px-6 md:px-16 lg:px-24 xl:px-40 py-12 w-full">
+        <div className="max-w-[1920px] mx-auto px-6 md:px-12 lg:px-16 py-12 w-full">
           <div className="h-px bg-academic-muted/20 w-full" />
         </div>
 
         {/* Research Section */}
         <motion.section 
           id="research" 
-          className="max-w-[1600px] mx-auto px-6 md:px-16 lg:px-24 xl:px-40 py-20 w-full"
+          className="max-w-[1920px] mx-auto px-6 md:px-12 lg:px-16 py-20 w-full"
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-100px" }}
@@ -293,7 +293,7 @@ export default function App() {
           viewport={{ once: true, margin: "-100px" }}
           variants={sectionVariants}
         >
-          <div className="max-w-[1600px] w-full mx-auto px-6 md:px-16 lg:px-24 xl:px-40">
+          <div className="max-w-[1920px] w-full mx-auto px-6 md:px-12 lg:px-16">
              <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-16 gap-6">
                 <div>
                   <h2 className="font-serif text-4xl md:text-5xl font-bold text-academic-primary mb-4 tracking-tight">Publikasi Akademik</h2>
@@ -332,7 +332,7 @@ export default function App() {
         {/* Teaching Materials (Bahan Ajar) */}
         <motion.section 
           id="teaching" 
-          className="max-w-[1600px] w-full mx-auto px-6 md:px-16 lg:px-24 xl:px-40 py-24"
+          className="max-w-[1920px] w-full mx-auto px-6 md:px-12 lg:px-16 py-24"
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-100px" }}
@@ -369,12 +369,12 @@ export default function App() {
                 <div className="p-6 flex-grow flex flex-col">
                   <ul className="space-y-4 mb-6 flex-grow">
                     {course.materials.map((mat, idx) => {
-                      // Gunakan utilitas jika kita mau force direct download,
+                      // Gunakan utilitas jika kita mau force direct download
                       // Tapi karena kita import, kita akan replace dengan custom action agar user bisa langsung klik dan unduh.
-                      const isDriveLink = mat.link.includes('drive.google.com');
+                      const isDriveLink = typeof mat.link === 'string' ? mat.link.includes('drive.google.com') : false;
                       // Simple regex for file ID mapping inside component
-                      let directLink = mat.link;
-                      if (isDriveLink && !mat.link.includes('uc?export=download')) {
+                      let directLink = mat.link || '#';
+                      if (isDriveLink && typeof mat.link === 'string' && !mat.link.includes('uc?export=download')) {
                         const match = mat.link.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
                         if (match && match[1]) directLink = `https://drive.google.com/uc?export=download&id=${match[1]}`;
                       }
@@ -431,7 +431,7 @@ export default function App() {
           viewport={{ once: true, margin: "-100px" }}
           variants={sectionVariants}
         >
-          <div className="max-w-[1600px] mx-auto px-6 md:px-16 lg:px-24 xl:px-40 grid md:grid-cols-2 gap-16">
+          <div className="max-w-[1920px] mx-auto px-6 md:px-12 lg:px-16 grid md:grid-cols-2 gap-16">
             <div>
               <h2 className="font-serif text-4xl md:text-5xl font-bold mb-6">Mari Berkolaborasi.</h2>
               <p className="text-white/70 mb-10 text-lg leading-relaxed max-w-md">
@@ -538,7 +538,7 @@ export default function App() {
       </main>
 
       <footer className="bg-academic-ink text-white py-8 border-t border-white/10 w-full">
-        <div className="max-w-[1600px] w-full mx-auto px-6 md:px-16 lg:px-24 xl:px-40 flex flex-col md:flex-row justify-between items-center gap-4">
+        <div className="max-w-[1920px] w-full mx-auto px-6 md:px-12 lg:px-16 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-white/50 text-sm">
             © {new Date().getFullYear()} {personalInfo.name}. Hak Cipta Dilindungi.
           </p>
