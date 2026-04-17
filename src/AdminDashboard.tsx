@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Plus, Trash2, Save, LogOut } from 'lucide-react';
+import { X, Plus, Trash2, Save, LogOut, Loader2, Check } from 'lucide-react';
 import { doc, setDoc } from 'firebase/firestore';
 import { db, auth, googleProvider } from './firebase';
 import { signInWithPopup, signInAnonymously } from 'firebase/auth';
@@ -7,6 +7,7 @@ import { signInWithPopup, signInAnonymously } from 'firebase/auth';
 export default function AdminDashboard({ data, setData, onClose }: any) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   
@@ -40,6 +41,7 @@ export default function AdminDashboard({ data, setData, onClose }: any) {
 
   const handleSave = async () => {
     setIsSaving(true);
+    setIsSaved(false);
     try {
       const docRef = doc(db, 'portfolio', 'data');
       await setDoc(docRef, {
@@ -51,7 +53,13 @@ export default function AdminDashboard({ data, setData, onClose }: any) {
       });
       setData(draftData);
       localStorage.setItem('portfolioData', JSON.stringify(draftData));
-      alert('Perubahan berhasil disimpan secara Global! Pengunjung kini akan melihat data terbaru.');
+      
+      setIsSaved(true);
+      setTimeout(() => {
+        setIsSaved(false);
+        onClose(); // Kembali ke halaman utama
+      }, 1500); // Popup 'Tersimpan' tampil selama 1.5 detik
+      
     } catch (error) {
       console.error(error);
       alert('Gagal menyimpan ke Database Firestore. Periksa koneksi internet Anda atau Rule Firestore.');
@@ -189,8 +197,9 @@ export default function AdminDashboard({ data, setData, onClose }: any) {
           <span className="bg-green-100 text-green-700 text-xs font-bold px-3 py-1 rounded-full border border-green-200">Terhubung ke Cloud Database</span>
         </div>
         <div className="flex gap-4">
-          <button onClick={handleSave} disabled={isSaving} className="flex items-center gap-2 bg-academic-accent text-white px-5 py-2 rounded-xl font-medium hover:opacity-90 transition-opacity shadow-md disabled:opacity-50">
-            {isSaving ? <Loader2 className="animate-spin" size={18} /> : <Save size={18} />} Simpan ke Server
+          <button onClick={handleSave} disabled={isSaving || isSaved} className={`flex items-center gap-2 px-5 py-2 rounded-xl font-medium transition-all shadow-md ${isSaved ? 'bg-green-500 text-white' : 'bg-academic-accent text-white hover:opacity-90 disabled:opacity-50'}`}>
+            {isSaving ? <Loader2 className="animate-spin" size={18} /> : isSaved ? <Check size={18} /> : <Save size={18} />} 
+            {isSaving ? 'Menyimpan...' : isSaved ? 'Tersimpan!' : 'Simpan ke Server'}
           </button>
           <button onClick={onClose} className="flex items-center gap-2 bg-academic-bg text-academic-ink border border-academic-muted/20 hover:bg-red-50 hover:text-red-600 hover:border-red-200 px-4 py-2 rounded-xl font-medium transition-all">
             <LogOut size={18} /> Keluar
