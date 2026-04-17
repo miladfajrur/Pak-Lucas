@@ -127,7 +127,7 @@ export default function App() {
       
       {/* Navigation */}
       <header className={`fixed top-0 w-full z-50 transition-all duration-500 ${isScrolled ? 'bg-academic-bg/90 backdrop-blur-md border-b border-academic-muted/20 py-4 shadow-sm' : 'bg-transparent py-6'}`}>
-        <div className="max-w-6xl mx-auto px-6 md:px-12 flex justify-between items-center">
+        <div className="max-w-[1600px] mx-auto px-6 md:px-16 lg:px-24 xl:px-40 flex justify-between items-center w-full">
           <a href="#home" className="flex flex-col">
             <span className="font-serif font-bold text-xl text-academic-primary tracking-tight">DR. LUCAS M. PATTINAMA</span>
             <span className="text-xs uppercase tracking-widest text-academic-muted mt-0.5">Dosen & Peneliti</span>
@@ -179,33 +179,33 @@ export default function App() {
 
       <main className="pt-24 md:pt-28">
         {/* Home / Hero Section */}
-        <section id="home" className="min-h-[calc(100vh-7rem)] flex items-center max-w-6xl mx-auto px-6 md:px-12 py-8 md:py-4">
-          <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center w-full">
+        <section id="home" className="min-h-[calc(100vh-7rem)] flex items-center justify-center w-full px-6 md:px-16 lg:px-24 xl:px-40 py-8 md:py-4">
+          <div className="grid md:grid-cols-2 gap-8 md:gap-16 lg:gap-24 items-center w-full max-w-[1600px]">
             <motion.div 
               initial={{ opacity: 0, x: -30 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8 }}
-              className="order-2 md:order-1"
+              className="order-2 md:order-1 flex flex-col justify-center"
             >
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-academic-primary/10 text-academic-primary rounded-full text-xs font-bold tracking-widest uppercase mb-5">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-academic-primary/10 text-academic-primary rounded-full text-xs font-bold tracking-widest uppercase mb-5 self-start">
                 <GraduationCap size={15} />
                 <span>Akademisi</span>
               </div>
-              <h1 className="font-serif text-4xl sm:text-5xl md:text-[3.5rem] lg:text-[4.2rem] font-extrabold leading-[1.1] tracking-tight mb-5 text-academic-primary">
+              <h1 className="font-serif text-5xl sm:text-6xl md:text-[4rem] lg:text-[4.5rem] xl:text-[5.5rem] font-extrabold leading-[1.05] tracking-tight mb-6 text-academic-primary">
                 Komunikasi,<br />
                 <span className="text-academic-accent italic font-bold">Pendidikan Kristen</span>,<br />
                 <span className="text-academic-primary">&amp; Kepemimpinan.</span>
               </h1>
-              <p className="text-base md:text-lg lg:text-xl font-medium text-academic-muted leading-relaxed mb-8 max-w-xl">
+              <p className="text-lg md:text-xl lg:text-2xl font-medium text-academic-muted leading-relaxed mb-10 max-w-2xl">
                 {personalInfo.bio}
               </p>
               
               <div className="flex flex-wrap gap-4">
-                <a href="#publications" className="bg-academic-primary text-white px-8 py-4 rounded-xl font-semibold text-sm transition-transform hover:-translate-y-1 shadow-lg shadow-academic-primary/20 flex items-center gap-2">
-                  Lihat Publikasi <ChevronRight size={18} />
+                <a href="#publications" className="bg-academic-primary text-white px-10 py-5 rounded-2xl font-semibold text-base transition-transform hover:-translate-y-1 shadow-lg shadow-academic-primary/20 flex items-center gap-3">
+                  Lihat Publikasi <ChevronRight size={20} />
                 </a>
-                <a href="#teaching" className="bg-white border-2 border-academic-primary/10 text-academic-primary px-8 py-4 rounded-xl font-semibold text-sm transition-colors hover:bg-academic-primary/5 flex items-center gap-2">
-                  <Download size={18} /> Bahan Ajar
+                <a href="#teaching" className="bg-white border-2 border-academic-primary/10 text-academic-primary px-10 py-5 rounded-2xl font-semibold text-base transition-colors hover:bg-academic-primary/5 flex items-center gap-3">
+                  <Download size={20} /> Bahan Ajar
                 </a>
               </div>
             </motion.div>
@@ -216,7 +216,7 @@ export default function App() {
               transition={{ duration: 0.8, delay: 0.2 }}
               className="order-1 md:order-2 relative flex justify-center md:justify-end w-full"
             >
-              <div className="w-full max-w-[280px] sm:max-w-[320px] md:max-w-[340px] xl:max-w-[380px] aspect-[4/5] rounded-[2rem] overflow-hidden relative shadow-[0_20px_50px_rgba(10,25,48,0.15)] bg-academic-bg border-8 border-white">
+              <div className="w-full max-w-[320px] sm:max-w-[380px] md:max-w-[420px] lg:max-w-[500px] xl:max-w-[580px] aspect-[4/5] rounded-[2.5rem] overflow-hidden relative shadow-[0_30px_60px_rgba(10,25,48,0.2)] bg-academic-bg border-[12px] border-white">
                 {/* Gunakan layout height yang lebih besar (112%) daripada scale CSS, 
                     untuk mencegah gambar pecah (rasterization blur) oleh GPU di browser, 
                     sambil tetap meng-crop watermark di bagian bawah */}
@@ -231,23 +231,23 @@ export default function App() {
               </div>
               
               {/* Decorative elements */}
-              <div className="absolute bottom-6 sm:bottom-8 -left-2 sm:-left-6 md:-left-12 bg-white/95 backdrop-blur-md p-5 pb-4 rounded-2xl shadow-xl border border-academic-primary/10 max-w-[200px] md:max-w-[240px]">
-                <p className="font-serif font-extrabold text-academic-accent text-3xl md:text-3xl">STTIAA</p>
-                <p className="text-xs font-bold uppercase tracking-wide text-academic-ink mt-1.5 text-balance leading-snug">Sekolah Tinggi Theologi<br/>Injili Abdi Allah</p>
+              <div className="absolute bottom-8 sm:bottom-12 -left-4 sm:-left-12 md:-left-20 bg-white/95 backdrop-blur-md p-6 pb-5 rounded-3xl shadow-2xl border border-academic-primary/10 max-w-[240px] md:max-w-[280px]">
+                <p className="font-serif font-extrabold text-academic-accent text-4xl md:text-4xl">STTIAA</p>
+                <p className="text-sm font-bold uppercase tracking-wide text-academic-ink mt-2 text-balance leading-snug">Sekolah Tinggi Theologi<br/>Injili Abdi Allah</p>
               </div>
             </motion.div>
           </div>
         </section>
 
         {/* Section Divider */}
-        <div className="max-w-6xl mx-auto px-6 md:px-12 py-12">
+        <div className="max-w-[1600px] mx-auto px-6 md:px-16 lg:px-24 xl:px-40 py-12 w-full">
           <div className="h-px bg-academic-muted/20 w-full" />
         </div>
 
         {/* Research Section */}
         <motion.section 
           id="research" 
-          className="max-w-6xl mx-auto px-6 md:px-12 py-20"
+          className="max-w-[1600px] mx-auto px-6 md:px-16 lg:px-24 xl:px-40 py-20 w-full"
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-100px" }}
@@ -293,7 +293,7 @@ export default function App() {
           viewport={{ once: true, margin: "-100px" }}
           variants={sectionVariants}
         >
-          <div className="max-w-6xl mx-auto px-6 md:px-12">
+          <div className="max-w-[1600px] w-full mx-auto px-6 md:px-16 lg:px-24 xl:px-40">
              <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-16 gap-6">
                 <div>
                   <h2 className="font-serif text-4xl md:text-5xl font-bold text-academic-primary mb-4 tracking-tight">Publikasi Akademik</h2>
@@ -332,7 +332,7 @@ export default function App() {
         {/* Teaching Materials (Bahan Ajar) */}
         <motion.section 
           id="teaching" 
-          className="max-w-6xl mx-auto px-6 md:px-12 py-24"
+          className="max-w-[1600px] w-full mx-auto px-6 md:px-16 lg:px-24 xl:px-40 py-24"
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-100px" }}
@@ -431,7 +431,7 @@ export default function App() {
           viewport={{ once: true, margin: "-100px" }}
           variants={sectionVariants}
         >
-          <div className="max-w-6xl mx-auto px-6 md:px-12 grid md:grid-cols-2 gap-16">
+          <div className="max-w-[1600px] mx-auto px-6 md:px-16 lg:px-24 xl:px-40 grid md:grid-cols-2 gap-16">
             <div>
               <h2 className="font-serif text-4xl md:text-5xl font-bold mb-6">Mari Berkolaborasi.</h2>
               <p className="text-white/70 mb-10 text-lg leading-relaxed max-w-md">
@@ -537,8 +537,8 @@ export default function App() {
         </motion.section>
       </main>
 
-      <footer className="bg-academic-ink text-white py-8 border-t border-white/10">
-        <div className="max-w-6xl mx-auto px-6 md:px-12 flex flex-col md:flex-row justify-between items-center gap-4">
+      <footer className="bg-academic-ink text-white py-8 border-t border-white/10 w-full">
+        <div className="max-w-[1600px] w-full mx-auto px-6 md:px-16 lg:px-24 xl:px-40 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-white/50 text-sm">
             © {new Date().getFullYear()} {personalInfo.name}. Hak Cipta Dilindungi.
           </p>

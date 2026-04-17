@@ -1,14 +1,12 @@
 import React, { useState } from 'react';
-import { X, Plus, Trash2, Save, LogOut, UploadCloud, Loader2 } from 'lucide-react';
+import { X, Plus, Trash2, Save, LogOut } from 'lucide-react';
 import { doc, setDoc } from 'firebase/firestore';
-import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
-import { db, storage, auth, googleProvider } from './firebase';
+import { db, auth, googleProvider } from './firebase';
 import { signInWithPopup, signInAnonymously } from 'firebase/auth';
 
 export default function AdminDashboard({ data, setData, onClose }: any) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [uploadingState, setUploadingState] = useState<{ [key: string]: number }>({});
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   
@@ -60,46 +58,6 @@ export default function AdminDashboard({ data, setData, onClose }: any) {
     } finally {
       setIsSaving(false);
     }
-  };
-
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>, callback: (url: string, size: string) => void, uploadId: string) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    // Hitung ukuran MB
-    const sizeInMB = (file.size / (1024 * 1024)).toFixed(2) + ' MB';
-
-    // Buat referensi storage ke Firebase
-    const storageRef = ref(storage, `uploads/${Date.now()}_${file.name}`);
-    const uploadTask = uploadBytesResumable(storageRef, file);
-
-    setUploadingState(prev => ({ ...prev, [uploadId]: 0 }));
-
-    uploadTask.on('state_changed', 
-      (snapshot) => {
-        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-        setUploadingState(prev => ({ ...prev, [uploadId]: progress }));
-      }, 
-      (error) => {
-        console.error(error);
-        alert("Gagal mengupload file ke Storage.");
-        setUploadingState(prev => {
-          const newState = { ...prev };
-          delete newState[uploadId];
-          return newState;
-        });
-      }, 
-      () => {
-        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-          callback(downloadURL, sizeInMB);
-          setUploadingState(prev => {
-            const newState = { ...prev };
-            delete newState[uploadId];
-            return newState;
-          });
-        });
-      }
-    );
   };
 
   if (!isAuthenticated) {
@@ -294,9 +252,7 @@ export default function AdminDashboard({ data, setData, onClose }: any) {
                   </button>
                 </div>
                 <div className="space-y-8">
-                  {draftData.publications.map((item: any, idx: number) => {
-                    const upId = `pub_${idx}`;
-                    return (
+                  {draftData.publications.map((item: any, idx: number) => (
                     <div key={idx} className="p-6 md:p-8 border border-academic-muted/20 rounded-2xl relative bg-white shadow-sm hover:shadow-md transition-shadow">
                       <button onClick={() => removePub(idx)} className="absolute top-6 right-6 text-red-400 hover:text-red-600 bg-red-50 hover:bg-red-100 p-2 rounded-lg transition-colors"><Trash2 size={18} /></button>
                       <h3 className="font-bold text-lg mb-6 pr-12 text-academic-ink">Publikasi #{idx + 1}: {item.title || '(Tanpa Judul)'}</h3>
@@ -306,19 +262,10 @@ export default function AdminDashboard({ data, setData, onClose }: any) {
                           <input type="text" value={item.title} onChange={e => updatePub(idx, 'title', e.target.value)} className="w-full px-4 py-3 bg-academic-bg border border-academic-muted/20 rounded-xl focus:ring-2 focus:ring-academic-accent outline-none text-sm font-serif font-medium" />
                         </div>
                         <div>
-                          <label className="block flex items-center justify-between text-xs font-bold uppercase tracking-widest text-academic-muted mb-2">
-                            <span>Link URL (Atau Upload PDF)</span>
-                            {uploadingState[upId] !== undefined && (
-                              <span className="text-academic-accent">Uploading {Math.round(uploadingState[upId])}%</span>
-                            )}
+                          <label className="block text-xs font-bold uppercase tracking-widest text-academic-muted mb-2">
+                            Tautan / Link URL Publikasi
                           </label>
-                          <div className="flex relative">
-                             <input type="text" value={item.link} onChange={e => updatePub(idx, 'link', e.target.value)} className="w-full px-4 py-3 bg-academic-bg border border-academic-muted/20 rounded-l-xl focus:ring-2 focus:ring-academic-accent outline-none text-sm" placeholder="https://" />
-                             <label title="Upload PDF ke Cloud" className="bg-academic-accent border border-academic-accent text-white px-4 py-3 rounded-r-xl cursor-pointer hover:bg-academic-primary transition-colors flex items-center justify-center shrink-0">
-                               {uploadingState[upId] !== undefined ? <Loader2 className="animate-spin" size={18} /> : <UploadCloud size={18} />}
-                               <input type="file" className="hidden" accept=".pdf,.doc,.docx" onChange={(e) => handleFileUpload(e, (url) => updatePub(idx, 'link', url), upId)} />
-                             </label>
-                          </div>
+                          <input type="text" value={item.link} onChange={e => updatePub(idx, 'link', e.target.value)} className="w-full px-4 py-3 bg-academic-bg border border-academic-muted/20 rounded-xl focus:ring-2 focus:ring-academic-accent outline-none text-sm" placeholder="https://" />
                         </div>
                         <div>
                           <label className="block text-xs font-bold uppercase tracking-widest text-academic-muted mb-2">Penulis (Authors)</label>
@@ -341,7 +288,7 @@ export default function AdminDashboard({ data, setData, onClose }: any) {
                         </div>
                       </div>
                     </div>
-                  )})}
+                  ))}
                 </div>
               </div>
             )}
@@ -384,9 +331,7 @@ export default function AdminDashboard({ data, setData, onClose }: any) {
                         </div>
                         <div className="space-y-3">
                           {course.materials.length === 0 && <p className="text-sm text-academic-muted italic text-center py-4">Belum ada file materi ditambahkan untuk kampus/kursus ini.</p>}
-                          {course.materials.map((mat: any, mIdx: number) => {
-                            const upId = `mat_${cIdx}_${mIdx}`;
-                            return (
+                          {course.materials.map((mat: any, mIdx: number) => (
                              <div key={mIdx} className="flex flex-col md:flex-row gap-3 items-center bg-white p-3 rounded-xl border border-academic-muted/10">
                               <input type="text" placeholder="Judul File / Topik Materi" value={mat.title} onChange={e => updateMaterial(cIdx, mIdx, 'title', e.target.value)} className="w-full md:flex-1 px-3 py-2 bg-academic-bg rounded-lg text-sm border-transparent focus:border-academic-accent outline-none" />
                               <div className="flex w-full md:w-auto gap-2 items-center">
@@ -397,18 +342,11 @@ export default function AdminDashboard({ data, setData, onClose }: any) {
                                   <option value="zip">ZIP</option>
                                 </select>
                                 <input type="text" placeholder="Size" value={mat.size} onChange={e => updateMaterial(cIdx, mIdx, 'size', e.target.value)} className="w-20 px-3 py-2 bg-academic-bg border border-academic-muted/20 rounded-lg text-sm outline-none" />
-                                <div className="flex relative">
-                                  <input type="text" placeholder="URL Link" value={mat.link} onChange={e => updateMaterial(cIdx, mIdx, 'link', e.target.value)} className="w-32 md:w-40 px-3 py-2 bg-academic-bg border border-academic-muted/20 rounded-l-lg text-sm outline-none" />
-                                  <label title="Upload File ke Cloud Storage" className="bg-academic-accent text-white px-3 py-2 rounded-r-lg cursor-pointer hover:bg-academic-primary transition-colors flex items-center justify-center shrink-0">
-                                    {uploadingState[upId] !== undefined ? <Loader2 className="animate-spin" size={16} /> : <UploadCloud size={16} />}
-                                    <input type="file" className="hidden" accept=".pdf,.doc,.docx,.ppt,.pptx,.zip" onChange={(e) => handleFileUpload(e, (url, sz) => { updateMaterial(cIdx, mIdx, 'link', url); updateMaterial(cIdx, mIdx, 'size', sz); }, upId)} />
-                                  </label>
-                                </div>
+                                <input type="text" placeholder="URL Tautan Link" value={mat.link} onChange={e => updateMaterial(cIdx, mIdx, 'link', e.target.value)} className="w-40 md:w-48 px-3 py-2 bg-academic-bg border border-academic-muted/20 rounded-lg text-sm outline-none focus:border-academic-accent" />
                                 <button onClick={() => removeMaterial(cIdx, mIdx)} className="text-red-400 hover:text-red-600 bg-red-50 hover:bg-red-100 p-2 rounded-lg ml-1"><Trash2 size={18} /></button>
                               </div>
                              </div>
-                            );
-                          })}
+                            ))}
                         </div>
                       </div>
                     </div>
