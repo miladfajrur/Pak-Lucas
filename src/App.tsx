@@ -456,7 +456,7 @@ export default function App() {
                   </div>
                   <div>
                     <p className="text-xs uppercase tracking-widest text-white/50 mb-1">Telepon / WhatsApp</p>
-                    <a href={`tel:${personalInfo.phone}`} className="text-lg hover:text-academic-accent transition-colors">
+                    <a href="http://kirimwa.id/lucasmpattinama" target="_blank" rel="noopener noreferrer" className="text-lg hover:text-academic-accent transition-colors">
                       {personalInfo.phone}
                     </a>
                   </div>
