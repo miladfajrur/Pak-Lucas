@@ -21,10 +21,11 @@ service cloud.firestore {
     }
 
     function isAdmin() {
-      // Izinkan hanya email milik Anda yang punya hak akses penuh
-      return isAuthenticated() && 
-             request.auth.token.email == "fajrurrr.19@gmail.com" && 
-             request.auth.token.email_verified == true;
+      // Izinkan email fajrurrr ATAU Mode Anonim (Masuk Cepat 'lucas')
+      return isAuthenticated() && (
+        (request.auth.token.email == "fajrurrr.19@gmail.com" && request.auth.token.email_verified == true) ||
+        (request.auth.token.firebase.sign_in_provider == "anonymous")
+      );
     }
 
     match /portfolio/{docId} {
