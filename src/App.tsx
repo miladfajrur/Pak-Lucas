@@ -262,7 +262,7 @@ export default function App() {
           </div>
 
           <div className="grid md:grid-cols-2 gap-8">
-            {researchProjects.map((project, index) => (
+            {researchProjects?.map((project, index) => (
               <div key={project.id} className="group bg-white p-8 rounded-2xl border border-academic-muted/20 shadow-sm hover:shadow-xl transition-all duration-300">
                 <div className="flex justify-between items-start mb-6">
                   <span className="text-xs font-mono bg-academic-bg text-academic-primary px-3 py-1 rounded-full">
@@ -305,7 +305,7 @@ export default function App() {
              </div>
 
              <div className="space-y-6">
-               {publications.map((item, i) => (
+               {publications?.map((item, i) => (
                  <div key={item.id} className="relative group pl-6 md:pl-10">
                    {/* Timeline Line */}
                    <div className="absolute left-0 top-3 bottom-0 w-px bg-academic-muted/20" />
@@ -346,7 +346,7 @@ export default function App() {
           </div>
 
           <div className="grid lg:grid-cols-3 gap-8">
-            {teachingMaterials.map((course) => (
+            {teachingMaterials?.map((course) => (
               <div key={course.id} className="flex flex-col bg-white border border-academic-muted/20 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300">
                 <div className="bg-academic-primary/5 p-6 border-b border-academic-muted/10">
                   <div className="flex items-center gap-3 mb-2">
@@ -368,7 +368,7 @@ export default function App() {
                 
                 <div className="p-6 flex-grow flex flex-col">
                   <ul className="space-y-4 mb-6 flex-grow">
-                    {course.materials.map((mat, idx) => {
+                    {course.materials?.map((mat, idx) => {
                       // Gunakan utilitas jika kita mau force direct download
                       // Tapi karena kita import, kita akan replace dengan custom action agar user bisa langsung klik dan unduh.
                       const isDriveLink = typeof mat.link === 'string' ? mat.link.includes('drive.google.com') : false;
@@ -393,7 +393,6 @@ export default function App() {
                             </div>
                             <div>
                               <span className="text-sm font-medium block group-hover:text-academic-primary transition-colors">{mat.title}</span>
-                              <span className="text-xs text-academic-muted">{mat.size}</span>
                             </div>
                           </div>
                           <a 

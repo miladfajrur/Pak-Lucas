@@ -145,7 +145,7 @@ export default function AdminDashboard({ data, setData, onClose }: any) {
   
   const addMaterial = (courseIndex: number) => {
     const newCourses = [...draftData.teachingMaterials];
-    newCourses[courseIndex].materials.push({ title: '', type: 'pdf', size: '', link: '' });
+    newCourses[courseIndex].materials.push({ title: '', type: 'pdf', link: '' });
     setDraftData({ ...draftData, teachingMaterials: newCourses });
   };
   const updateMaterial = (courseIndex: number, matIndex: number, field: string, value: string) => {
@@ -252,7 +252,7 @@ export default function AdminDashboard({ data, setData, onClose }: any) {
                   </button>
                 </div>
                 <div className="space-y-8">
-                  {draftData.publications.map((item: any, idx: number) => (
+                  {draftData.publications?.map((item: any, idx: number) => (
                     <div key={idx} className="p-6 md:p-8 border border-academic-muted/20 rounded-2xl relative bg-white shadow-sm hover:shadow-md transition-shadow">
                       <button onClick={() => removePub(idx)} className="absolute top-6 right-6 text-red-400 hover:text-red-600 bg-red-50 hover:bg-red-100 p-2 rounded-lg transition-colors"><Trash2 size={18} /></button>
                       <h3 className="font-bold text-lg mb-6 pr-12 text-academic-ink">Publikasi #{idx + 1}: {item.title || '(Tanpa Judul)'}</h3>
@@ -302,7 +302,7 @@ export default function AdminDashboard({ data, setData, onClose }: any) {
                   </button>
                 </div>
                 <div className="space-y-10">
-                  {draftData.teachingMaterials.map((course: any, cIdx: number) => (
+                  {draftData.teachingMaterials?.map((course: any, cIdx: number) => (
                     <div key={cIdx} className="p-6 md:p-8 border-2 border-academic-primary/10 rounded-[32px] relative bg-white shadow-sm hover:shadow-md transition-shadow">
                       <button onClick={() => removeCourse(cIdx)} className="absolute top-6 right-6 text-red-500 bg-red-50 hover:bg-red-100 hover:text-red-700 p-2 rounded-xl transition-colors"><Trash2 size={18} /></button>
                       <h3 className="font-bold text-xl mb-6 pr-12 text-academic-primary font-serif">Mata Kuliah: {course.course || '(Tanpa Nama)'}</h3>
@@ -330,8 +330,8 @@ export default function AdminDashboard({ data, setData, onClose }: any) {
                           </button>
                         </div>
                         <div className="space-y-3">
-                          {course.materials.length === 0 && <p className="text-sm text-academic-muted italic text-center py-4">Belum ada file materi ditambahkan untuk kampus/kursus ini.</p>}
-                          {course.materials.map((mat: any, mIdx: number) => (
+                          {course.materials?.length === 0 && <p className="text-sm text-academic-muted italic text-center py-4">Belum ada file materi ditambahkan untuk kampus/kursus ini.</p>}
+                          {course.materials?.map((mat: any, mIdx: number) => (
                              <div key={mIdx} className="flex flex-col md:flex-row gap-3 items-center bg-white p-3 rounded-xl border border-academic-muted/10">
                               <input type="text" placeholder="Judul File / Topik Materi" value={mat.title} onChange={e => updateMaterial(cIdx, mIdx, 'title', e.target.value)} className="w-full md:flex-1 px-3 py-2 bg-academic-bg rounded-lg text-sm border-transparent focus:border-academic-accent outline-none" />
                               <div className="flex w-full md:w-auto gap-2 items-center">
@@ -341,8 +341,7 @@ export default function AdminDashboard({ data, setData, onClose }: any) {
                                   <option value="doc">DOC</option>
                                   <option value="zip">ZIP</option>
                                 </select>
-                                <input type="text" placeholder="Size" value={mat.size} onChange={e => updateMaterial(cIdx, mIdx, 'size', e.target.value)} className="w-20 px-3 py-2 bg-academic-bg border border-academic-muted/20 rounded-lg text-sm outline-none" />
-                                <input type="text" placeholder="URL Tautan Link" value={mat.link} onChange={e => updateMaterial(cIdx, mIdx, 'link', e.target.value)} className="w-40 md:w-48 px-3 py-2 bg-academic-bg border border-academic-muted/20 rounded-lg text-sm outline-none focus:border-academic-accent" />
+                                <input type="text" placeholder="URL Tautan Link" value={mat.link} onChange={e => updateMaterial(cIdx, mIdx, 'link', e.target.value)} className="w-40 md:w-56 px-3 py-2 bg-academic-bg border border-academic-muted/20 rounded-lg text-sm outline-none focus:border-academic-accent" />
                                 <button onClick={() => removeMaterial(cIdx, mIdx)} className="text-red-400 hover:text-red-600 bg-red-50 hover:bg-red-100 p-2 rounded-lg ml-1"><Trash2 size={18} /></button>
                               </div>
                              </div>
@@ -364,7 +363,7 @@ export default function AdminDashboard({ data, setData, onClose }: any) {
                   </button>
                 </div>
                 <div className="space-y-8">
-                  {draftData.researchProjects.map((res: any, idx: number) => (
+                  {draftData.researchProjects?.map((res: any, idx: number) => (
                     <div key={idx} className="p-6 md:p-8 border border-academic-muted/20 rounded-2xl relative bg-white shadow-sm hover:shadow-md transition-shadow">
                       <button onClick={() => removeResearch(idx)} className="absolute top-6 right-6 text-red-400 hover:text-red-600 bg-red-50 hover:bg-red-100 p-2 rounded-lg transition-colors"><Trash2 size={18} /></button>
                       <h3 className="font-bold text-lg mb-6 pr-12 text-academic-ink">Proyek Riset #{idx + 1}</h3>
