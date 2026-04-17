@@ -20,12 +20,19 @@ service cloud.firestore {
        return request.auth != null;
     }
 
+    function isAdmin() {
+      // Izinkan hanya email milik Anda yang punya hak akses penuh
+      return isAuthenticated() && 
+             request.auth.token.email == "fajrurrr.19@gmail.com" && 
+             request.auth.token.email_verified == true;
+    }
+
     match /portfolio/{docId} {
       // Allow public read since this is a public portfolio website
       allow read: if docId == 'data';
       
-      // Allow write if authenticated (Admin uses anonymous auth or Google Auth)
-      allow write: if isAuthenticated() && docId == 'data';
+      // Allow write if authenticated with the specific admin email
+      allow write: if isAdmin() && docId == 'data';
     }
   }
 }
