@@ -177,35 +177,35 @@ export default function App() {
         )}
       </AnimatePresence>
 
-      <main className="pt-32">
+      <main className="pt-24 md:pt-28">
         {/* Home / Hero Section */}
-        <section id="home" className="min-h-[85vh] flex items-center max-w-6xl mx-auto px-6 md:px-12 py-12">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
+        <section id="home" className="min-h-[calc(100vh-7rem)] flex items-center max-w-6xl mx-auto px-6 md:px-12 py-8 md:py-4">
+          <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center w-full">
             <motion.div 
               initial={{ opacity: 0, x: -30 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8 }}
               className="order-2 md:order-1"
             >
-              <div className="inline-flex items-center gap-2 px-3 py-1 bg-academic-primary/10 text-academic-primary rounded-full text-xs font-semibold tracking-wider uppercase mb-6">
-                <GraduationCap size={14} />
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-academic-primary/10 text-academic-primary rounded-full text-xs font-bold tracking-widest uppercase mb-5">
+                <GraduationCap size={15} />
                 <span>Akademisi</span>
               </div>
-              <h1 className="font-serif text-4xl sm:text-5xl md:text-[3.2rem] lg:text-[4rem] xl:text-[4.5rem] font-bold leading-[1.15] tracking-tight mb-6 text-academic-primary">
+              <h1 className="font-serif text-4xl sm:text-5xl md:text-[3.5rem] lg:text-[4.2rem] font-extrabold leading-[1.1] tracking-tight mb-5 text-academic-primary">
                 Komunikasi,<br />
-                <span className="text-academic-accent italic">Pendidikan Kristen</span>,<br />
-                <span className="text-academic-ink/80">&amp; Kepemimpinan.</span>
+                <span className="text-academic-accent italic font-bold">Pendidikan Kristen</span>,<br />
+                <span className="text-academic-primary">&amp; Kepemimpinan.</span>
               </h1>
-              <p className="text-lg text-academic-muted leading-relaxed mb-8 max-w-lg">
+              <p className="text-base md:text-lg lg:text-xl font-medium text-academic-muted leading-relaxed mb-8 max-w-xl">
                 {personalInfo.bio}
               </p>
               
               <div className="flex flex-wrap gap-4">
-                <a href="#publications" className="bg-academic-primary text-white px-8 py-3.5 rounded-xl font-medium text-sm transition-transform hover:-translate-y-0.5 shadow-lg shadow-academic-primary/10 flex items-center gap-2">
-                  Lihat Publikasi <ChevronRight size={16} />
+                <a href="#publications" className="bg-academic-primary text-white px-8 py-4 rounded-xl font-semibold text-sm transition-transform hover:-translate-y-1 shadow-lg shadow-academic-primary/20 flex items-center gap-2">
+                  Lihat Publikasi <ChevronRight size={18} />
                 </a>
-                <a href="#teaching" className="bg-white border border-academic-muted/20 text-academic-ink px-8 py-3.5 rounded-xl font-medium text-sm transition-colors hover:bg-academic-bg flex items-center gap-2 shadow-sm">
-                  <Download size={16} /> Bahan Ajar
+                <a href="#teaching" className="bg-white border-2 border-academic-primary/10 text-academic-primary px-8 py-4 rounded-xl font-semibold text-sm transition-colors hover:bg-academic-primary/5 flex items-center gap-2">
+                  <Download size={18} /> Bahan Ajar
                 </a>
               </div>
             </motion.div>
@@ -216,7 +216,7 @@ export default function App() {
               transition={{ duration: 0.8, delay: 0.2 }}
               className="order-1 md:order-2 relative flex justify-center md:justify-end w-full"
             >
-              <div className="w-full max-w-[300px] sm:max-w-[340px] md:max-w-[400px] aspect-[4/5] rounded-[2rem] overflow-hidden relative shadow-2xl shadow-academic-primary/5 bg-academic-bg border-8 border-white">
+              <div className="w-full max-w-[280px] sm:max-w-[320px] md:max-w-[340px] xl:max-w-[380px] aspect-[4/5] rounded-[2rem] overflow-hidden relative shadow-[0_20px_50px_rgba(10,25,48,0.15)] bg-academic-bg border-8 border-white">
                 {/* Gunakan layout height yang lebih besar (112%) daripada scale CSS, 
                     untuk mencegah gambar pecah (rasterization blur) oleh GPU di browser, 
                     sambil tetap meng-crop watermark di bagian bawah */}
@@ -227,13 +227,13 @@ export default function App() {
                   style={{ imageRendering: 'high-quality', WebkitFontSmoothing: 'antialiased' }}
                   referrerPolicy="no-referrer"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-academic-ink/30 via-transparent to-transparent pointer-events-none" />
+                <div className="absolute inset-0 bg-gradient-to-t from-academic-primary/40 via-transparent to-transparent pointer-events-none" />
               </div>
               
               {/* Decorative elements */}
-              <div className="absolute bottom-8 -left-2 sm:-left-6 md:-left-8 bg-white/95 backdrop-blur-md p-5 pb-4 rounded-2xl shadow-xl border border-academic-muted/10 max-w-[200px] md:max-w-[220px]">
-                <p className="font-serif font-bold text-academic-primary text-2xl md:text-3xl">STTIAA</p>
-                <p className="text-xs uppercase tracking-wider text-academic-muted mt-1 text-balance">Sekolah Tinggi Theologi Injili Abdi Allah</p>
+              <div className="absolute bottom-6 sm:bottom-8 -left-2 sm:-left-6 md:-left-12 bg-white/95 backdrop-blur-md p-5 pb-4 rounded-2xl shadow-xl border border-academic-primary/10 max-w-[200px] md:max-w-[240px]">
+                <p className="font-serif font-extrabold text-academic-accent text-3xl md:text-3xl">STTIAA</p>
+                <p className="text-xs font-bold uppercase tracking-wide text-academic-ink mt-1.5 text-balance leading-snug">Sekolah Tinggi Theologi<br/>Injili Abdi Allah</p>
               </div>
             </motion.div>
           </div>

@@ -1,24 +1,27 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;1,400;1,600&family=Inter:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
 
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-serif: "Playfair Display", ui-serif, Georgia, serif;
   
-  /* Bright, Elegant, Simple Palette */
-  --color-academic-bg: #FFFFFF; /* Bright white */
-  --color-academic-ink: #1E293B; /* Slate 800 - elegant dark gray */
-  --color-academic-primary: #0F172A; /* Slate 900 - bold primary */
-  --color-academic-accent: #2563EB; /* Royal blue - bright & elegant accent */
-  --color-academic-muted: #64748B; /* Clean slate gray */
+  /* High-Contrast, Clear & Elegant Palette */
+  --color-academic-bg: #FFFFFF; /* Pure bright white */
+  --color-academic-ink: #111827; /* Gray 900 - pitch dark for high contrast */
+  --color-academic-primary: #0A1930; /* Very Deep Navy Blue - solid primary */
+  --color-academic-accent: #0056D2; /* Vibrant Royal Blue - extremely clear */
+  --color-academic-muted: #4B5563; /* Gray 600 - High visibility for subtext */
 }
 
 body {
   background-color: var(--color-academic-bg);
   color: var(--color-academic-ink);
   font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-serif);
+  color: var(--color-academic-primary);
 }
