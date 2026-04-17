@@ -52,12 +52,14 @@ export default function AdminDashboard({ data, setData, onClose }: any) {
         updatedAt: new Date().toISOString()
       });
       setData(draftData);
-      localStorage.setItem('portfolioData', JSON.stringify(draftData));
+      try {
+        localStorage.setItem('portfolioData', JSON.stringify(draftData));
+      } catch (e) {}
       
       setIsSaved(true);
       setTimeout(() => {
         setIsSaved(false);
-        onClose(); // Kembali ke halaman utama
+        window.location.reload(); // Refresh the whole page cleanly
       }, 1500); // Popup 'Tersimpan' tampil selama 1.5 detik
       
     } catch (error) {

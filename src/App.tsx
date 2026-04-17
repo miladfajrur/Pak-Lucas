@@ -53,7 +53,9 @@ export default function App() {
           researchProjects: d.researchProjects ? JSON.parse(d.researchProjects) : initRes
         };
         setAppData(updatedData);
-        localStorage.setItem('portfolioData', JSON.stringify(updatedData));
+        try {
+          localStorage.setItem('portfolioData', JSON.stringify(updatedData));
+        } catch(e) {}
       }
     }, (error) => {
       console.error("Firebase read error:", error);
