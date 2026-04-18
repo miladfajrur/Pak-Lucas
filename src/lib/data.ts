@@ -111,3 +111,41 @@ export const researchProjects = [
     description: "Mengkaji pergeseran nilai dan interaksi keluarga Kristen dalam menghadapi tantangan komunikasi di era digitalisasi informasi."
   }
 ];
+
+export const newsData = [
+  {
+    id: 1,
+    title: "Peluncuran Sistem E-Learning Baru STTIAA",
+    date: "15 April 2026",
+    content: "STTIAA dengan bangga meluncurkan platform pembelajaran jarak jauh untuk memfasilitasi mahasiswa dari berbagai daerah.",
+    imageUrl: "https://i.ibb.co.com/9kBVK2Hx/Gemini-Generated-Image-9mbi7a9mbi7a9mbi.png"
+  }
+];
+
+export const renunganData = [
+  {
+    id: 1,
+    title: "Kekuatan Dalam Kelemahan",
+    date: "18 April 2026",
+    verse: "2 Korintus 12:9",
+    content: "Tetapi jawab Tuhan kepadaku: 'Cukuplah kasih karunia-Ku bagimu, sebab justru dalam kelemahanlah kuasa-Ku menjadi sempurna.'"
+  }
+];
+
+export const minatData = {
+  pendidikan: "Fokus pada pengembangan metode pembelajaran yang holistik dan terintegrasi dengan nilai-nilai kristiani.",
+  kepemimpinan: "Mengkaji pola kepemimpinan pelayan (servant leadership) dalam institusi pendidikan dan gerejawi.",
+  kristen: "Eksposisi nilai-nilai alkitabiah dalam konteks budaya kontemporer.",
+  komunikasi: "Membangun jembatan komunikasi antarbudaya yang efektif dan berpusat pada empati."
+};
+
+export const productsData = [
+  {
+    id: 1,
+    title: "Buku: Dasar-Dasar PAK",
+    type: "buku",
+    description: "Buku panduan lengkap tentang dasar-dasar Pendidikan Agama Kristen.",
+    link: "#",
+    coverUrl: "https://i.ibb.co.com/9kBVK2Hx/Gemini-Generated-Image-9mbi7a9mbi7a9mbi.png"
+  }
+];

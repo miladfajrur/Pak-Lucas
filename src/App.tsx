@@ -1,8 +1,9 @@
 import { useState, useEffect, FormEvent } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { BookOpen, GraduationCap, FileText, Download, Mail, Phone, MapPin, ExternalLink, ChevronRight, Menu, X, Book, LayoutDashboard } from 'lucide-react';
-import { personalInfo as initPersonal, publications as initPubs, teachingMaterials as initTeaching, researchProjects as initRes } from './lib/data';
+import { personalInfo as initPersonal, publications as initPubs, teachingMaterials as initTeaching, researchProjects as initRes, newsData as initNews, renunganData as initRenungan, minatData as initMinat, productsData as initProducts } from './lib/data';
 import AdminDashboard from './AdminDashboard';
+import SidebarMenu from './SidebarMenu';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { db } from './firebase';
 
@@ -38,7 +39,11 @@ export default function App() {
       personalInfo: initPersonal,
       publications: initPubs,
       teachingMaterials: initTeaching,
-      researchProjects: initRes
+      researchProjects: initRes,
+      newsData: initNews,
+      renunganData: initRenungan,
+      minatData: initMinat,
+      productsData: initProducts
     };
   });
 
@@ -50,7 +55,11 @@ export default function App() {
           personalInfo: d.personalInfo ? JSON.parse(d.personalInfo) : initPersonal,
           publications: d.publications ? JSON.parse(d.publications) : initPubs,
           teachingMaterials: d.teachingMaterials ? JSON.parse(d.teachingMaterials) : initTeaching,
-          researchProjects: d.researchProjects ? JSON.parse(d.researchProjects) : initRes
+          researchProjects: d.researchProjects ? JSON.parse(d.researchProjects) : initRes,
+          newsData: d.newsData ? JSON.parse(d.newsData) : initNews,
+          renunganData: d.renunganData ? JSON.parse(d.renunganData) : initRenungan,
+          minatData: d.minatData ? JSON.parse(d.minatData) : initMinat,
+          productsData: d.productsData ? JSON.parse(d.productsData) : initProducts
         };
         setAppData(updatedData);
         try {
@@ -115,6 +124,12 @@ export default function App() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  const handleNavigate = (sectionId: string) => {
+    setMobileMenuOpen(false);
+    setActiveSection(sectionId);
+    window.scrollTo(0, 0);
+  };
+
   const sectionVariants = {
     hidden: { opacity: 0, y: 30 },
     visible: { 
@@ -125,134 +140,129 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-academic-bg text-academic-ink font-sans selection:bg-academic-accent selection:text-white pb-20 sm:pb-0">
+    <div className="flex flex-row-reverse min-h-screen bg-academic-bg text-academic-ink font-sans selection:bg-academic-accent selection:text-white pb-20 sm:pb-0">
       
-      {/* Navigation */}
-      <header className={`fixed top-0 w-full z-50 transition-all duration-500 ${isScrolled ? 'bg-academic-bg/90 backdrop-blur-md border-b border-academic-muted/20 py-4 shadow-sm' : 'bg-transparent py-6'}`}>
-        <div className="max-w-[1920px] mx-auto px-6 md:px-12 lg:px-16 flex justify-between items-center w-full">
-          <a href="#home" className="flex flex-col">
-            <span className="font-serif font-bold text-xl text-academic-primary tracking-tight">DR. LUCAS M. PATTINAMA</span>
-            <span className="text-xs uppercase tracking-widest text-academic-muted mt-0.5">Dosen & Peneliti</span>
-          </a>
-          
-          <nav className="hidden md:flex gap-8 items-center">
-            <NavLink href="#home" text="Beranda" activeSection={activeSection} />
-            <NavLink href="#research" text="Penelitian" activeSection={activeSection} />
-            <NavLink href="#publications" text="Publikasi" activeSection={activeSection} />
-            <NavLink href="#teaching" text="Bahan Ajar" activeSection={activeSection} />
-            <NavLink href="#contact" text="Kontak" activeSection={activeSection} />
-          </nav>
+      {/* Desktop Sidebar */}
+      <SidebarMenu className="hidden lg:block w-[280px] shrink-0 sticky top-0" onNavigate={handleNavigate} />
 
-          <button 
-            className="md:hidden text-academic-ink" 
-            onClick={() => setMobileMenuOpen(true)}
-            aria-label="Open Menu"
-          >
-            <Menu size={24} />
-          </button>
-        </div>
-      </header>
+      {/* Main Content Area */}
+      <div className="flex-1 w-full min-w-0 flex flex-col relative border-r border-academic-muted/10">
 
-      {/* Mobile Menu */}
-      <AnimatePresence>
-        {mobileMenuOpen && (
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[60] bg-academic-bg/95 backdrop-blur-lg md:hidden flex flex-col pt-24 px-8"
-          >
+        {/* Mobile Header (Hidden on Desktop) */}
+        <header className={`lg:hidden fixed top-0 w-full z-40 transition-all duration-500 ${isScrolled ? 'bg-academic-bg/90 backdrop-blur-md border-b border-academic-muted/20 py-4 shadow-sm' : 'bg-transparent py-4'}`}>
+          <div className="mx-auto px-6 flex justify-between items-center w-full">
+            <a href="#home" className="flex flex-col">
+              <span className="font-serif font-bold text-lg text-academic-primary tracking-tight">DR. LUCAS M. PATTINAMA</span>
+              <span className="text-[10px] uppercase tracking-widest text-academic-muted mt-0.5">Dosen & Peneliti</span>
+            </a>
+            
             <button 
-              className="absolute top-6 right-6 text-academic-ink"
-              onClick={() => setMobileMenuOpen(false)}
+              className="text-academic-ink bg-white/50 backdrop-blur-sm p-2 rounded-lg border border-black/5" 
+              onClick={() => setMobileMenuOpen(true)}
+              aria-label="Open Menu"
             >
-              <X size={28} />
+              <Menu size={24} />
             </button>
-            <div className="flex flex-col gap-8 text-xl font-serif">
-              <a href="#home" onClick={() => setMobileMenuOpen(false)} className="border-b border-academic-muted/20 pb-4">Beranda</a>
-              <a href="#research" onClick={() => setMobileMenuOpen(false)} className="border-b border-academic-muted/20 pb-4">Penelitian</a>
-              <a href="#publications" onClick={() => setMobileMenuOpen(false)} className="border-b border-academic-muted/20 pb-4">Publikasi</a>
-              <a href="#teaching" onClick={() => setMobileMenuOpen(false)} className="border-b border-academic-muted/20 pb-4">Bahan Ajar</a>
-              <a href="#contact" onClick={() => setMobileMenuOpen(false)} className="border-b border-academic-muted/20 pb-4">Kontak</a>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      <main className="pt-24 md:pt-28">
-        {/* Home / Hero Section */}
-        <section id="home" className="min-h-[calc(100vh-7rem)] flex items-center justify-center w-full px-6 md:px-12 lg:px-16 py-8 md:py-4">
-          <div className="grid md:grid-cols-2 gap-8 md:gap-16 lg:gap-24 items-center w-full max-w-[1920px]">
-            <motion.div 
-              initial={{ opacity: 0, x: -30 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8 }}
-              className="order-2 md:order-1 flex flex-col justify-center"
-            >
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-academic-primary/10 text-academic-primary rounded-full text-xs font-bold tracking-widest uppercase mb-5 self-start">
-                <GraduationCap size={15} />
-                <span>Akademisi</span>
-              </div>
-              <h1 className="font-serif text-5xl sm:text-6xl md:text-[4rem] lg:text-[4.5rem] xl:text-[5.5rem] font-extrabold leading-[1.05] tracking-tight mb-6 text-academic-primary">
-                Komunikasi,<br />
-                <span className="text-academic-accent italic font-bold">Pendidikan Kristen</span>,<br />
-                <span className="text-academic-primary">&amp; Kepemimpinan.</span>
-              </h1>
-              <p className="text-lg md:text-xl lg:text-2xl font-medium text-academic-muted leading-relaxed mb-10 max-w-2xl">
-                {personalInfo.bio}
-              </p>
-              
-              <div className="flex flex-wrap gap-4">
-                <a href="#publications" className="bg-academic-primary text-white px-10 py-5 rounded-2xl font-semibold text-base transition-transform hover:-translate-y-1 shadow-lg shadow-academic-primary/20 flex items-center gap-3">
-                  Lihat Publikasi <ChevronRight size={20} />
-                </a>
-                <a href="#teaching" className="bg-white border-2 border-academic-primary/10 text-academic-primary px-10 py-5 rounded-2xl font-semibold text-base transition-colors hover:bg-academic-primary/5 flex items-center gap-3">
-                  <Download size={20} /> Bahan Ajar
-                </a>
-              </div>
-            </motion.div>
-
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-              className="order-1 md:order-2 relative flex justify-center md:justify-end w-full"
-            >
-              <div className="w-full max-w-[320px] sm:max-w-[380px] md:max-w-[420px] lg:max-w-[500px] xl:max-w-[580px] aspect-[4/5] rounded-[2.5rem] overflow-hidden relative shadow-[0_30px_60px_rgba(10,25,48,0.2)] bg-academic-bg border-[12px] border-white">
-                {/* Gunakan layout height yang lebih besar (112%) daripada scale CSS, 
-                    untuk mencegah gambar pecah (rasterization blur) oleh GPU di browser, 
-                    sambil tetap meng-crop watermark di bagian bawah */}
-                <img 
-                  src="https://i.ibb.co.com/9kBVK2Hx/Gemini-Generated-Image-9mbi7a9mbi7a9mbi.png" 
-                  alt={personalInfo.name} 
-                  className="absolute top-0 left-0 w-full h-[112%] object-cover object-top transition-transform duration-700 hover:scale-[1.03]"
-                  style={{ imageRendering: 'high-quality', WebkitFontSmoothing: 'antialiased' }}
-                  referrerPolicy="no-referrer"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-academic-primary/40 via-transparent to-transparent pointer-events-none" />
-              </div>
-              
-              {/* Decorative elements */}
-              <div className="absolute bottom-8 sm:bottom-12 -left-4 sm:-left-12 md:-left-20 bg-white/95 backdrop-blur-md p-6 pb-5 rounded-3xl shadow-2xl border border-academic-primary/10 max-w-[240px] md:max-w-[280px]">
-                <p className="font-serif font-extrabold text-academic-accent text-4xl md:text-4xl">STTIAA</p>
-                <p className="text-sm font-bold uppercase tracking-wide text-academic-ink mt-2 text-balance leading-snug">Sekolah Tinggi Theologi<br/>Injili Abdi Allah</p>
-              </div>
-            </motion.div>
           </div>
-        </section>
+        </header>
+
+        {/* Mobile Menu */}
+        <AnimatePresence>
+          {mobileMenuOpen && (
+            <motion.div 
+              initial={{ opacity: 0, x: 300 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 300 }}
+              transition={{ type: "spring", bounce: 0, duration: 0.4 }}
+              className="fixed inset-0 z-[60] lg:hidden flex justify-end"
+            >
+              <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setMobileMenuOpen(false)} />
+              
+              <div className="relative z-10 shadow-2xl">
+                <button 
+                  className="absolute top-4 left-4 text-white/50 hover:text-white z-50 bg-black/20 rounded-full p-1"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <X size={24} />
+                </button>
+                <SidebarMenu className="w-[280px] max-w-[80vw]" onNavigate={handleNavigate} />
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <main className="pt-20 lg:pt-0">
+        
+        {activeSection === 'home' && (
+          <section id="home" className="min-h-[calc(100vh-7rem)] flex items-center justify-center w-full px-6 md:px-12 lg:px-16 py-8 md:py-4">
+            <div className="grid md:grid-cols-2 gap-8 md:gap-16 lg:gap-24 items-center w-full max-w-[1920px]">
+              <motion.div 
+                initial={{ opacity: 0, x: -30 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.8 }}
+                className="order-2 md:order-1 flex flex-col justify-center"
+              >
+                <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-academic-primary/10 text-academic-primary rounded-full text-xs font-bold tracking-widest uppercase mb-5 self-start">
+                  <GraduationCap size={15} />
+                  <span>Akademisi</span>
+                </div>
+                <h1 className="font-serif text-5xl sm:text-6xl md:text-[4rem] lg:text-[4.5rem] xl:text-[5.5rem] font-extrabold leading-[1.05] tracking-tight mb-6 text-academic-primary">
+                  Komunikasi,<br />
+                  <span className="text-academic-accent italic font-bold">Pendidikan Kristen</span>,<br />
+                  <span className="text-academic-primary">&amp; Kepemimpinan.</span>
+                </h1>
+                <p className="text-lg md:text-xl lg:text-2xl font-medium text-academic-muted leading-relaxed mb-10 max-w-2xl">
+                  {personalInfo.bio}
+                </p>
+                
+                <div className="flex flex-wrap gap-4">
+                  <button onClick={() => handleNavigate('publications')} className="bg-academic-primary text-white px-10 py-5 rounded-2xl font-semibold text-base transition-transform hover:-translate-y-1 shadow-lg shadow-academic-primary/20 flex items-center gap-3">
+                    Lihat Publikasi <ChevronRight size={20} />
+                  </button>
+                  <button onClick={() => handleNavigate('teaching')} className="bg-white border-2 border-academic-primary/10 text-academic-primary px-10 py-5 rounded-2xl font-semibold text-base transition-colors hover:bg-academic-primary/5 flex items-center gap-3">
+                    <Download size={20} /> Bahan Ajar
+                  </button>
+                </div>
+              </motion.div>
+
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.8, delay: 0.2 }}
+                className="order-1 md:order-2 relative flex justify-center md:justify-end w-full"
+              >
+                <div className="w-full max-w-[320px] sm:max-w-[380px] md:max-w-[420px] lg:max-w-[500px] xl:max-w-[580px] aspect-[4/5] rounded-[2.5rem] overflow-hidden relative shadow-[0_30px_60px_rgba(10,25,48,0.2)] bg-academic-bg border-[12px] border-white">
+                  <img 
+                    src="https://i.ibb.co.com/9kBVK2Hx/Gemini-Generated-Image-9mbi7a9mbi7a9mbi.png" 
+                    alt={personalInfo.name} 
+                    className="absolute top-0 left-0 w-full h-[112%] object-cover object-top transition-transform duration-700 hover:scale-[1.03]"
+                    style={{ imageRendering: 'high-quality', WebkitFontSmoothing: 'antialiased' }}
+                    referrerPolicy="no-referrer"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-academic-primary/40 via-transparent to-transparent pointer-events-none" />
+                </div>
+                
+                {/* Decorative elements */}
+                <div className="absolute bottom-8 sm:bottom-12 -left-4 sm:-left-12 md:-left-20 bg-white/95 backdrop-blur-md p-6 pb-5 rounded-3xl shadow-2xl border border-academic-primary/10 max-w-[240px] md:max-w-[280px]">
+                  <p className="font-serif font-extrabold text-academic-accent text-4xl md:text-4xl">STTIAA</p>
+                  <p className="text-sm font-bold uppercase tracking-wide text-academic-ink mt-2 text-balance leading-snug">Sekolah Tinggi Theologi<br/>Injili Abdi Allah</p>
+                </div>
+              </motion.div>
+            </div>
+          </section>
+        )}
 
         {/* Section Divider */}
         <div className="max-w-[1920px] mx-auto px-6 md:px-12 lg:px-16 py-12 w-full">
           <div className="h-px bg-academic-muted/20 w-full" />
         </div>
 
-        {/* Research Section */}
+        {activeSection === 'research' && (
         <motion.section 
           id="research" 
           className="max-w-[1920px] mx-auto px-6 md:px-12 lg:px-16 py-20 w-full"
           initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-100px" }}
+          animate="visible"
           variants={sectionVariants}
         >
           <div className="mb-12 md:flex justify-between items-end">
@@ -285,14 +295,14 @@ export default function App() {
             ))}
           </div>
         </motion.section>
+        )}
 
-        {/* Publications Section */}
+        {activeSection === 'publications' && (
         <motion.section 
           id="publications" 
           className="bg-white py-24 border-y border-academic-muted/10 mt-12"
           initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-100px" }}
+          animate="visible"
           variants={sectionVariants}
         >
           <div className="max-w-[1920px] w-full mx-auto px-6 md:px-12 lg:px-16">
@@ -330,14 +340,15 @@ export default function App() {
              </div>
           </div>
         </motion.section>
+        )}
 
         {/* Teaching Materials (Bahan Ajar) */}
+        {activeSection === 'teaching' && (
         <motion.section 
           id="teaching" 
           className="max-w-[1920px] w-full mx-auto px-6 md:px-12 lg:px-16 py-24"
           initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-100px" }}
+          animate="visible"
           variants={sectionVariants}
         >
           <div className="flex flex-col md:flex-row justify-between items-center mb-16 gap-8">
@@ -429,14 +440,107 @@ export default function App() {
             ))}
           </div>
         </motion.section>
+        )}
 
-        {/* Contact Section */}
+        {/* Section Divider */}
+        <div className="max-w-[1920px] mx-auto px-6 md:px-12 lg:px-16 py-12 w-full">
+          <div className="h-px bg-academic-muted/20 w-full" />
+        </div>
+
+        {activeSection === 'news' && (
+        <motion.section id="news" className="max-w-[1920px] mx-auto px-6 md:px-12 lg:px-16 py-20 w-full" initial="hidden" animate="visible" variants={sectionVariants}>
+          <h2 className="font-serif text-4xl font-bold text-academic-primary mb-8 tracking-tight">Berita & Insight</h2>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {appData.newsData?.map((item, idx) => (
+               <div key={idx} className="bg-white rounded-2xl overflow-hidden shadow-sm border border-academic-muted/10 group cursor-pointer">
+                 {item.imageUrl && (
+                   <div className="h-48 overflow-hidden">
+                     <img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" referrerPolicy="no-referrer" />
+                   </div>
+                 )}
+                 <div className="p-6">
+                   <p className="text-xs font-bold text-academic-accent tracking-widest uppercase mb-2">{item.date}</p>
+                   <h3 className="font-serif text-xl font-bold text-academic-primary mb-3 leading-tight">{item.title}</h3>
+                   <p className="text-academic-muted text-sm line-clamp-3">{item.content}</p>
+                 </div>
+               </div>
+            ))}
+          </div>
+        </motion.section>
+        )}
+
+        {activeSection === 'renungan' && (
+        <motion.section id="renungan" className="max-w-[1920px] mx-auto px-6 md:px-12 lg:px-16 py-20 w-full bg-academic-bg border-y border-academic-muted/10" initial="hidden" animate="visible" variants={sectionVariants}>
+          <div className="max-w-3xl mx-auto text-center mb-12">
+            <h2 className="font-serif text-4xl font-bold text-academic-primary tracking-tight">Ruang Renungan</h2>
+            <div className="h-1 w-12 bg-academic-accent mx-auto mt-6 rounded-full" />
+          </div>
+          <div className="max-w-4xl mx-auto space-y-8">
+            {appData.renunganData?.map((item, idx) => (
+              <div key={idx} className="bg-white p-8 md:p-12 rounded-3xl shadow-lg border border-black/5 relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-2 h-full bg-gradient-to-b from-academic-accent to-academic-primary" />
+                <p className="text-sm font-bold text-academic-muted tracking-widest uppercase mb-4">{item.date}</p>
+                <h3 className="font-serif text-2xl md:text-3xl font-bold text-academic-primary mb-6">{item.title}</h3>
+                {item.verse && (
+                  <blockquote className="border-l-4 border-academic-accent pl-4 py-1 mb-6 text-academic-ink/80 italic font-medium">
+                    "{item.verse}"
+                  </blockquote>
+                )}
+                <div className="text-academic-muted leading-relaxed whitespace-pre-wrap">
+                  {item.content}
+                </div>
+              </div>
+            ))}
+          </div>
+        </motion.section>
+        )}
+
+        {activeSection === 'minat' && (
+        <motion.section id="minat" className="max-w-[1920px] mx-auto px-6 md:px-12 lg:px-16 py-20 w-full" initial="hidden" animate="visible" variants={sectionVariants}>
+          <h2 className="font-serif text-4xl font-bold text-academic-primary mb-8 tracking-tight">Bidang Minat</h2>
+          <div className="grid md:grid-cols-2 gap-8">
+            {appData.minatData && Object.entries(appData.minatData).map(([key, value]) => (
+              <div key={key} className="bg-white p-8 rounded-2xl shadow-sm border border-academic-muted/10">
+                <h3 className="font-serif text-2xl font-bold text-academic-primary capitalize mb-4">{key}</h3>
+                <p className="text-academic-muted leading-relaxed">{value as string}</p>
+              </div>
+            ))}
+          </div>
+        </motion.section>
+        )}
+
+        {activeSection === 'products' && (
+        <motion.section id="products" className="max-w-[1920px] mx-auto px-6 md:px-12 lg:px-16 py-20 w-full bg-white border-y border-academic-muted/10" initial="hidden" animate="visible" variants={sectionVariants}>
+          <h2 className="font-serif text-4xl font-bold text-academic-primary mb-8 tracking-tight">Koleksi Produk & Publikasi</h2>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+            {appData.productsData?.map((item, idx) => (
+              <div key={idx} className="bg-academic-bg rounded-2xl overflow-hidden border border-academic-muted/10 flex flex-col group hover:shadow-xl transition-shadow">
+                <div className="w-full aspect-square relative overflow-hidden bg-gray-100">
+                  <img src={item.coverUrl} alt={item.title} className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500" referrerPolicy="no-referrer" />
+                  <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest text-academic-primary">
+                    {item.type}
+                  </div>
+                </div>
+                <div className="p-6 flex flex-col flex-grow">
+                  <h3 className="font-serif text-xl font-bold text-academic-primary mb-2 line-clamp-2">{item.title}</h3>
+                  <p className="text-sm text-academic-muted flex-grow mb-4 line-clamp-3">{item.description}</p>
+                  <a href={item.link} className="inline-flex items-center justify-between w-full p-3 rounded-xl bg-academic-primary/5 text-academic-primary font-semibold hover:bg-academic-primary hover:text-white transition-colors">
+                    <span>Akses Item</span>
+                    <ExternalLink size={16} />
+                  </a>
+                </div>
+              </div>
+            ))}
+          </div>
+        </motion.section>
+        )}
+
+        {activeSection === 'contact' && (
         <motion.section 
           id="contact" 
           className="bg-academic-primary text-white py-24"
           initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-100px" }}
+          animate="visible"
           variants={sectionVariants}
         >
           <div className="max-w-[1920px] mx-auto px-6 md:px-12 lg:px-16 grid md:grid-cols-2 gap-16">
@@ -543,6 +647,7 @@ export default function App() {
             </div>
           </div>
         </motion.section>
+        )}
       </main>
 
       <footer className="bg-academic-ink text-white py-8 border-t border-white/10 w-full">
@@ -562,6 +667,8 @@ export default function App() {
       {showAdmin && (
         <AdminDashboard data={appData} setData={setAppData} onClose={() => setShowAdmin(false)} />
       )}
+      
+      </div>
     </div>
   );
 }

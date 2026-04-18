@@ -49,8 +49,13 @@ export default function AdminDashboard({ data, setData, onClose }: any) {
         publications: JSON.stringify(draftData.publications),
         teachingMaterials: JSON.stringify(draftData.teachingMaterials),
         researchProjects: JSON.stringify(draftData.researchProjects),
+        newsData: JSON.stringify(draftData.newsData),
+        renunganData: JSON.stringify(draftData.renunganData),
+        minatData: JSON.stringify(draftData.minatData),
+        productsData: JSON.stringify(draftData.productsData),
+        galleryData: JSON.stringify(draftData.galleryData),
         updatedAt: new Date().toISOString()
-      });
+      }, { merge: true });
       setData(draftData);
       try {
         localStorage.setItem('portfolioData', JSON.stringify(draftData));
@@ -184,11 +189,60 @@ export default function AdminDashboard({ data, setData, onClose }: any) {
     setDraftData({ ...draftData, researchProjects: newRes });
   };
 
+  const addNews = () => {
+    const newNews = { id: Date.now(), title: '', date: '', content: '', imageUrl: '' };
+    setDraftData({ ...draftData, newsData: [newNews, ...(draftData.newsData || [])] });
+  };
+  const updateNews = (index: number, field: string, value: string) => {
+    const newData = [...draftData.newsData];
+    newData[index] = { ...newData[index], [field]: value };
+    setDraftData({ ...draftData, newsData: newData });
+  };
+  const removeNews = (index: number) => {
+    const newData = [...draftData.newsData];
+    newData.splice(index, 1);
+    setDraftData({ ...draftData, newsData: newData });
+  };
+
+  const addRenungan = () => {
+    const newItem = { id: Date.now(), title: '', date: '', verse: '', content: '' };
+    setDraftData({ ...draftData, renunganData: [newItem, ...(draftData.renunganData || [])] });
+  };
+  const updateRenungan = (index: number, field: string, value: string) => {
+    const newData = [...draftData.renunganData];
+    newData[index] = { ...newData[index], [field]: value };
+    setDraftData({ ...draftData, renunganData: newData });
+  };
+  const removeRenungan = (index: number) => {
+    const newData = [...draftData.renunganData];
+    newData.splice(index, 1);
+    setDraftData({ ...draftData, renunganData: newData });
+  };
+
+  const addProduct = () => {
+    const newItem = { id: Date.now(), title: '', type: '', description: '', link: '', coverUrl: '' };
+    setDraftData({ ...draftData, productsData: [newItem, ...(draftData.productsData || [])] });
+  };
+  const updateProduct = (index: number, field: string, value: string) => {
+    const newData = [...draftData.productsData];
+    newData[index] = { ...newData[index], [field]: value };
+    setDraftData({ ...draftData, productsData: newData });
+  };
+  const removeProduct = (index: number) => {
+    const newData = [...draftData.productsData];
+    newData.splice(index, 1);
+    setDraftData({ ...draftData, productsData: newData });
+  };
+
   const tabs = [
     { id: 'bio', label: 'Biodata & Kontak' },
     { id: 'pub', label: 'Publikasi Jurnal' },
     { id: 'teach', label: 'Bahan Ajar' },
-    { id: 'res', label: 'Penelitian' }
+    { id: 'res', label: 'Penelitian' },
+    { id: 'news', label: 'News' },
+    { id: 'renungan', label: 'Renungan' },
+    { id: 'minat', label: 'Minat Khusus' },
+    { id: 'products', label: 'Products' }
   ];
 
   return (
@@ -209,15 +263,18 @@ export default function AdminDashboard({ data, setData, onClose }: any) {
         </div>
       </div>
 
-      <div className="flex flex-1 overflow-hidden relative">
-        <div className="w-64 bg-white border-r border-academic-muted/10 p-4 shrink-0 flex flex-col gap-2 z-10">
-          <p className="text-xs font-bold uppercase tracking-widest text-academic-muted mb-4 mt-2 px-4">Menu Editing</p>
+      <div className="flex flex-row-reverse flex-1 overflow-hidden relative">
+        <div className="w-72 bg-gradient-to-b from-academic-primary to-academic-ink text-white p-6 shrink-0 flex flex-col gap-3 z-10 shadow-xl">
+          <p className="text-xs font-bold uppercase tracking-widest text-white/50 mb-4 mt-2 px-2 border-b border-white/10 pb-4">Menu Editing</p>
           {tabs.map(tab => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`text-left px-4 py-3 rounded-xl font-medium transition-all ${activeTab === tab.id ? 'bg-academic-primary text-white shadow-md' : 'text-academic-muted hover:bg-academic-bg hover:text-academic-ink'}`}
+              className={`text-left flex items-center px-5 py-4 rounded-2xl font-semibold transition-all duration-300 relative overflow-hidden ${activeTab === tab.id ? 'bg-gradient-to-r from-[#e3b841] to-[#dfa126] text-academic-primary shadow-lg shadow-black/20 translate-x-1' : 'text-white/70 hover:bg-white/10 hover:text-white'}`}
             >
+              {activeTab === tab.id && (
+                <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-white rounded-l-2xl" />
+              )}
               {tab.label}
             </button>
           ))}
@@ -405,6 +462,141 @@ export default function AdminDashboard({ data, setData, onClose }: any) {
                 </div>
               </div>
             )}
+
+            {activeTab === 'news' && (
+              <div>
+                <div className="flex justify-between items-center border-b border-academic-muted/10 pb-4 mb-8">
+                  <h2 className="text-2xl font-serif font-bold text-academic-primary">Berita & Pengumuman</h2>
+                  <button onClick={addNews} className="flex items-center gap-2 bg-green-50 text-green-700 px-4 py-2 rounded-xl font-semibold text-sm hover:bg-green-100 hover:shadow-sm border border-green-200 transition-all">
+                    <Plus size={16} /> Berita Baru
+                  </button>
+                </div>
+                <div className="space-y-8">
+                  {draftData.newsData?.map((item: any, idx: number) => (
+                    <div key={idx} className="p-6 md:p-8 border border-academic-muted/20 rounded-2xl relative bg-white shadow-sm transition-shadow">
+                      <button onClick={() => removeNews(idx)} className="absolute top-6 right-6 text-red-400 hover:text-red-600 bg-red-50 hover:bg-red-100 p-2 rounded-lg transition-colors"><Trash2 size={18} /></button>
+                      <h3 className="font-bold text-lg mb-6 pr-12 text-academic-ink">Berita #{idx + 1}</h3>
+                      <div className="grid md:grid-cols-2 gap-5 pr-4">
+                        <div className="md:col-span-2">
+                          <label className="block text-xs font-bold uppercase tracking-widest text-academic-muted mb-2">Judul</label>
+                          <input type="text" value={item.title} onChange={e => updateNews(idx, 'title', e.target.value)} className="w-full px-4 py-3 bg-academic-bg border border-academic-muted/20 rounded-xl focus:ring-2 focus:ring-academic-accent text-sm" />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-bold uppercase tracking-widest text-academic-muted mb-2">Tanggal Berita</label>
+                          <input type="text" value={item.date} onChange={e => updateNews(idx, 'date', e.target.value)} className="w-full px-4 py-3 bg-academic-bg border border-academic-muted/20 rounded-xl focus:ring-2 focus:ring-academic-accent text-sm" />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-bold uppercase tracking-widest text-academic-muted mb-2">URL Gambar (Opsional)</label>
+                          <input type="text" value={item.imageUrl} onChange={e => updateNews(idx, 'imageUrl', e.target.value)} className="w-full px-4 py-3 bg-academic-bg border border-academic-muted/20 rounded-xl focus:ring-2 focus:ring-academic-accent text-sm" />
+                        </div>
+                        <div className="md:col-span-2">
+                          <label className="block text-xs font-bold uppercase tracking-widest text-academic-muted mb-2">Konten</label>
+                          <textarea rows={4} value={item.content} onChange={e => updateNews(idx, 'content', e.target.value)} className="w-full px-4 py-3 bg-academic-bg border border-academic-muted/20 rounded-xl focus:ring-2 focus:ring-academic-accent text-sm resize-none"></textarea>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'renungan' && (
+              <div>
+                <div className="flex justify-between items-center border-b border-academic-muted/10 pb-4 mb-8">
+                  <h2 className="text-2xl font-serif font-bold text-academic-primary">Renungan / Artikel</h2>
+                  <button onClick={addRenungan} className="flex items-center gap-2 bg-green-50 text-green-700 px-4 py-2 rounded-xl font-semibold text-sm hover:bg-green-100 hover:shadow-sm border border-green-200 transition-all">
+                    <Plus size={16} /> Renungan Baru
+                  </button>
+                </div>
+                <div className="space-y-8">
+                  {draftData.renunganData?.map((item: any, idx: number) => (
+                    <div key={idx} className="p-6 md:p-8 border border-academic-muted/20 rounded-2xl relative bg-white shadow-sm transition-shadow">
+                      <button onClick={() => removeRenungan(idx)} className="absolute top-6 right-6 text-red-400 hover:text-red-600 bg-red-50 hover:bg-red-100 p-2 rounded-lg transition-colors"><Trash2 size={18} /></button>
+                      <h3 className="font-bold text-lg mb-6 pr-12 text-academic-ink">Renungan #{idx + 1}</h3>
+                      <div className="grid md:grid-cols-2 gap-5 pr-4">
+                        <div className="md:col-span-2">
+                          <label className="block text-xs font-bold uppercase tracking-widest text-academic-muted mb-2">Judul</label>
+                          <input type="text" value={item.title} onChange={e => updateRenungan(idx, 'title', e.target.value)} className="w-full px-4 py-3 bg-academic-bg border border-academic-muted/20 rounded-xl focus:ring-2 focus:ring-academic-accent text-sm" />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-bold uppercase tracking-widest text-academic-muted mb-2">Tanggal Berita</label>
+                          <input type="text" value={item.date} onChange={e => updateRenungan(idx, 'date', e.target.value)} className="w-full px-4 py-3 bg-academic-bg border border-academic-muted/20 rounded-xl focus:ring-2 focus:ring-academic-accent text-sm" />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-bold uppercase tracking-widest text-academic-muted mb-2">Ayat / Nats (Opsional)</label>
+                          <input type="text" value={item.verse} onChange={e => updateRenungan(idx, 'verse', e.target.value)} className="w-full px-4 py-3 bg-academic-bg border border-academic-muted/20 rounded-xl focus:ring-2 focus:ring-academic-accent text-sm" />
+                        </div>
+                        <div className="md:col-span-2">
+                          <label className="block text-xs font-bold uppercase tracking-widest text-academic-muted mb-2">Isi Renungan</label>
+                          <textarea rows={5} value={item.content} onChange={e => updateRenungan(idx, 'content', e.target.value)} className="w-full px-4 py-3 bg-academic-bg border border-academic-muted/20 rounded-xl focus:ring-2 focus:ring-academic-accent text-sm resize-none"></textarea>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'minat' && (
+              <div className="space-y-6">
+                <h2 className="text-2xl font-serif font-bold text-academic-primary border-b border-academic-muted/10 pb-4 mb-8">Minat Khusus Akademik</h2>
+                <div className="grid md:grid-cols-2 gap-6">
+                  {draftData.minatData && Object.keys(draftData.minatData).map((key) => (
+                    <div key={key} className="col-span-1 md:col-span-2">
+                      <label className="block text-xs font-semibold uppercase tracking-widest text-academic-muted mb-2">{key}</label>
+                      <textarea 
+                        rows={3} 
+                        value={draftData.minatData[key] || ''} 
+                        onChange={(e) => setDraftData({...draftData, minatData: {...draftData.minatData, [key]: e.target.value}})} 
+                        className="w-full px-4 py-3 bg-academic-bg border border-academic-muted/20 rounded-xl focus:ring-2 focus:ring-academic-accent outline-none text-sm resize-none" 
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'products' && (
+              <div>
+                <div className="flex justify-between items-center border-b border-academic-muted/10 pb-4 mb-8">
+                  <h2 className="text-2xl font-serif font-bold text-academic-primary">Manajemen Produk & Buku</h2>
+                  <button onClick={addProduct} className="flex items-center gap-2 bg-green-50 text-green-700 px-4 py-2 rounded-xl font-semibold text-sm hover:bg-green-100 hover:shadow-sm border border-green-200 transition-all">
+                    <Plus size={16} /> Tambah Produk
+                  </button>
+                </div>
+                <div className="space-y-8">
+                  {draftData.productsData?.map((item: any, idx: number) => (
+                    <div key={idx} className="p-6 md:p-8 border border-academic-muted/20 rounded-2xl relative bg-white shadow-sm transition-shadow">
+                      <button onClick={() => removeProduct(idx)} className="absolute top-6 right-6 text-red-400 hover:text-red-600 bg-red-50 hover:bg-red-100 p-2 rounded-lg transition-colors"><Trash2 size={18} /></button>
+                      <h3 className="font-bold text-lg mb-6 pr-12 text-academic-ink">Item #{idx + 1}</h3>
+                      <div className="grid md:grid-cols-2 gap-5 pr-4">
+                        <div className="md:col-span-2">
+                          <label className="block text-xs font-bold uppercase tracking-widest text-academic-muted mb-2">Judul Buku / Produk</label>
+                          <input type="text" value={item.title} onChange={e => updateProduct(idx, 'title', e.target.value)} className="w-full px-4 py-3 bg-academic-bg border border-academic-muted/20 rounded-xl focus:ring-2 focus:ring-academic-accent text-sm" />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-bold uppercase tracking-widest text-academic-muted mb-2">Tipe (Buku / Ajar)</label>
+                          <input type="text" value={item.type} onChange={e => updateProduct(idx, 'type', e.target.value)} className="w-full px-4 py-3 bg-academic-bg border border-academic-muted/20 rounded-xl focus:ring-2 focus:ring-academic-accent text-sm" />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-bold uppercase tracking-widest text-academic-muted mb-2">URL Akses</label>
+                          <input type="text" value={item.link} onChange={e => updateProduct(idx, 'link', e.target.value)} className="w-full px-4 py-3 bg-academic-bg border border-academic-muted/20 rounded-xl focus:ring-2 focus:ring-academic-accent text-sm" />
+                        </div>
+                        <div className="md:col-span-2">
+                          <label className="block text-xs font-bold uppercase tracking-widest text-academic-muted mb-2">Gambar Sampul URL</label>
+                          <input type="text" value={item.coverUrl} onChange={e => updateProduct(idx, 'coverUrl', e.target.value)} className="w-full px-4 py-3 bg-academic-bg border border-academic-muted/20 rounded-xl focus:ring-2 focus:ring-academic-accent text-sm" />
+                        </div>
+                        <div className="md:col-span-2">
+                          <label className="block text-xs font-bold uppercase tracking-widest text-academic-muted mb-2">Deskripsi</label>
+                          <textarea rows={3} value={item.description} onChange={e => updateProduct(idx, 'description', e.target.value)} className="w-full px-4 py-3 bg-academic-bg border border-academic-muted/20 rounded-xl focus:ring-2 focus:ring-academic-accent text-sm resize-none"></textarea>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
 
           </div>
         </div>
